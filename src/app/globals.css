@@ -1,0 +1,150 @@
+@import "tailwindcss";
+
+/* ============================================================
+   DESIGN TOKENS — monochrome editorial + single signal accent
+   ============================================================ */
+@theme {
+  /* Monochrome base — never pure #000 */
+  --color-ink: #0a0a0a; /* base dark panel        */
+  --color-ink-soft: #161616; /* raised dark surface    */
+  --color-paper: #f5f5f5; /* page background — light gray (all sections) */
+  --color-paper-pure: #ffffff; /* white cards / panels (pop on the gray page) */
+  --color-muted: #8c8c8c; /* secondary text on dark */
+  --color-muted-ink: #5b5b5b; /* secondary text on light*/
+
+  /* The ONE accent — signal orange, used sparingly */
+  --color-accent: #ff4d00;
+
+  /* Recurring rounded-frame radius (panels, cards, inputs share it) */
+  --radius-frame: 1.75rem;
+}
+
+@theme inline {
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo,
+    monospace;
+}
+
+/* ============================================================
+   BASE
+   ============================================================ */
+:root {
+  color-scheme: light;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+button:not(:disabled),
+[role="button"]:not([aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* ============================================================
+   LENIS smooth scroll
+   ============================================================ */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+/* ============================================================
+   FILM GRAIN overlay (fixed, pointer-events-none — GPU safe)
+   ============================================================ */
+.grain-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  opacity: 0.035;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 120px 120px;
+}
+
+/* ============================================================
+   PROGRESSIVE BLUR — content softens toward the bottom edge
+   (layers stacked in the React component)
+   ============================================================ */
+.progressive-blur {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 7rem;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* ============================================================
+   MARQUEE
+   ============================================================ */
+@keyframes marquee-x {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+.marquee-track {
+  display: inline-flex;
+  flex-shrink: 0;
+  white-space: nowrap;
+  will-change: transform;
+  animation: marquee-x var(--marquee-duration, 32s) linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+/* ============================================================
+   REDUCED MOTION
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-track {
+    animation: none;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
