@@ -53,6 +53,11 @@ export const en: typeof uk = {
     letsTalk: "Let's talk",
     directly: "Direct",
     messenger: "Messenger",
+    // work viewer
+    author: "Author",
+    year: "Year",
+    viewOnBehance: "View on Behance",
+    workDialogLabel: "Work preview",
   },
 
   eyebrows: {
@@ -188,6 +193,7 @@ export const en: typeof uk = {
     },
   ],
 
+  worksHeading: "Selected projects",
   processHeading: "How I run a project",
   process: [
     {

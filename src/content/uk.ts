@@ -59,6 +59,11 @@ export const uk = {
     letsTalk: "Поговоримо",
     directly: "Напряму",
     messenger: "Месенджер",
+    // перегляд роботи
+    author: "Автор",
+    year: "Рік",
+    viewOnBehance: "Дивитись на Behance",
+    workDialogLabel: "Перегляд роботи",
   },
 
   // Заголовки-плашки над секціями
@@ -196,6 +201,7 @@ export const uk = {
     },
   ],
 
+  worksHeading: "Вибрані проєкти",
   processHeading: "Як я веду проєкт",
   process: [
     {
