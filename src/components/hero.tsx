@@ -49,9 +49,13 @@ export function Hero() {
   const initial = reduce ? "show" : "hidden";
 
   return (
+    /* pb: more breathing room under the last row, but only where the panel can
+       spare it. On desktop the pin locks this section to exactly 100dvh while
+       the content needs ~718px, so on a short window the extra padding would
+       push the card under the clip instead of adding air. */
     <section
       id="top"
-      className="relative flex min-h-[88dvh] flex-col justify-between overflow-hidden rounded-frame bg-ink px-5 pb-10 pt-8 text-white sm:px-8 lg:px-[52px] lg:pb-[60px] lg:pt-12"
+      className="relative flex min-h-[88dvh] flex-col justify-between overflow-hidden rounded-frame bg-ink px-5 pb-14 pt-8 text-white sm:px-8 lg:px-[52px] lg:pb-[88px] lg:pt-12 lg:[@media(max-height:760px)]:pb-[60px]"
     >
       {/* background — scrubbed video on desktop, static photo + fade on
           phone/tablet. The cursor water-drops reveal is still kept in
