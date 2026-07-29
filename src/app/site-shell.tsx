@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { GeistSans } from "geist/font/sans";
 import { GeistMono } from "geist/font/mono";
+import { Analytics } from "@vercel/analytics/next";
 import { SmoothScroll } from "@/components/smooth-scroll";
 import { SiteChrome } from "@/components/site-chrome";
 import { ProgressiveBlur } from "@/components/progressive-blur";
@@ -37,6 +38,10 @@ export function SiteShell({
         </SmoothScroll>
         <ProgressiveBlur />
         <div aria-hidden className="grain-overlay" />
+        {/* Vercel Web Analytics — cookie-less, so no consent banner is needed.
+            Sits in the shared shell, so /uk and /en are both counted. Numbers
+            are visible only in the Vercel dashboard, never on the page. */}
+        <Analytics />
       </body>
     </html>
   );
