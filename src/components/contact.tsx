@@ -121,7 +121,7 @@ export function Contact() {
             </div>
           </Reveal>
           <Reveal>
-            <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-[2.2px] text-[#8c8c8c] lg:flex-row lg:items-center lg:justify-between">
+            <div className="mt-8 flex flex-col gap-4 border-t border-white/10 pt-6 font-mono text-[10px] uppercase tracking-[2.2px] text-[#8c8c8c] lg:flex-row lg:items-center lg:justify-between lg:text-[12px]">
               {/* © + UA/EN share a row from tablet up; nav drops to its own
                   row on phone/tablet, then rejoins inline on desktop (contents) */}
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:contents">

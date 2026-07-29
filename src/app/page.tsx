@@ -12,7 +12,7 @@ import { Reveal } from "@/components/reveal";
 
 export default function Home() {
   return (
-    <main className="flex flex-col gap-3 px-2.5 pt-2.5 pb-2.5 sm:gap-4 sm:px-3 sm:pt-3 sm:pb-3">
+    <main className="flex flex-col gap-3 overflow-x-clip px-2.5 pt-2.5 pb-2.5 sm:gap-4 sm:px-3 sm:pt-3 sm:pb-3">
       {/* hero + tech-stack scroll choreography (hero recedes, stack emerges from under) */}
       <HeroStackReveal />
 

@@ -2,6 +2,7 @@
 
 import { ArrowUpRight } from "@phosphor-icons/react";
 import { Magnetic } from "@/components/magnetic";
+import { Marquee } from "@/components/marquee";
 import { Reveal } from "@/components/reveal";
 import { brand } from "@/lib/brand";
 import { contentWide } from "@/lib/layout";
@@ -19,7 +20,18 @@ function openContact() {
  */
 export function OfferBanner() {
   return (
-    <section id="offer">
+    <section id="offer" className="relative">
+      {/* white running ticker mirrored above the orange block — same stripe,
+          light surface (white bg / dark text), tilted the opposite way
+          (+4° vs the orange stripe's -4°) */}
+      <div
+        aria-hidden
+        style={{ rotate: "4deg" }}
+        className="pointer-events-none absolute left-1/2 top-0 z-10 w-[110vw] -translate-x-1/2 -translate-y-1/2"
+      >
+        <Marquee items={brand.ticker} tone="light" />
+      </div>
+
       <div className={contentWide}>
         <Reveal>
           <div className="relative flex h-[520px] flex-col justify-between overflow-hidden rounded-[28px] px-6 pb-12 pt-10 sm:h-[600px] sm:px-10 lg:h-[660px] lg:px-[52px] lg:pb-[60px] lg:pt-12">

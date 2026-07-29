@@ -4,6 +4,8 @@ import { motion, useReducedMotion, type Variants } from "framer-motion";
 import { ArrowUpRight } from "@phosphor-icons/react";
 import { Magnetic } from "@/components/magnetic";
 import { HeroCard } from "@/components/hero-card";
+import { HeroScrubVideo } from "@/components/hero-scrub-video";
+// import { HeroReveal } from "@/components/hero-reveal"; // cursor water-drops reveal — temporarily disabled (keep)
 import { brand } from "@/lib/brand";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
@@ -51,13 +53,9 @@ export function Hero() {
       id="top"
       className="relative flex min-h-[88dvh] flex-col justify-between overflow-hidden rounded-frame bg-ink px-5 pb-10 pt-8 text-white sm:px-8 lg:px-[52px] lg:pb-[60px] lg:pt-12"
     >
-      {/* background photo — no darkening overlay (the photo carries its own contrast) */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/hero-bg.png"
-        alt=""
-        className="absolute inset-0 h-full w-full object-cover object-center"
-      />
+      {/* background — mouse-scrub video (replaces the static photo). The cursor
+          water-drops reveal is still kept in hero-reveal.tsx if we ever revert. */}
+      <HeroScrubVideo src="/hero.mp4" />
       <div aria-hidden className="absolute inset-0 bg-black/10" />
 
       {/* eyebrow — Geist Mono 10px (mobile) → 12px / 1.2px / uppercase / 90% */}

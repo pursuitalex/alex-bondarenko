@@ -1,4 +1,5 @@
 import { Eyebrow } from "@/components/eyebrow";
+import { Marquee } from "@/components/marquee";
 import { Reveal } from "@/components/reveal";
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
 import { brand } from "@/lib/brand";
@@ -11,7 +12,18 @@ import { contentWide } from "@/lib/layout";
  */
 export function ForWhom() {
   return (
-    <section id="for-whom" className="py-16 sm:py-20 lg:py-28">
+    <section id="for-whom" className="relative py-16 sm:py-20 lg:py-28">
+      {/* diagonal running ticker (Figma 52:12026) — absolute, full-bleed (w-screen),
+          centred on the section's BOTTOM edge so it fills the gap before Projects.
+          Takes no layout space; <main> has overflow-x-clip so the rotated stripe
+          spans edge-to-edge with no side gaps and is never cut off vertically. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute bottom-0 left-1/2 z-10 w-[110vw] -translate-x-1/2 translate-y-1/2 -rotate-[4deg]"
+      >
+        <Marquee items={brand.ticker} />
+      </div>
+
       <div className={contentWide}>
         {/* header */}
         <div className="flex flex-col gap-6 sm:gap-8">

@@ -19,6 +19,17 @@ export const brand = {
   ctaSecondary: "Дивитись роботи",
   roles: ["UI/UX дизайн", "Графічний дизайн", "Фронтенд", "Full-stack"],
 
+  // Diagonal running ticker stripe (Figma 52:12026)
+  ticker: [
+    "UI/UX Design",
+    "Graphic Design",
+    "Website Design",
+    "15+ years of exp.",
+    "Brand Design",
+    "Application Design",
+    "Alex Bondarenko",
+  ],
+
   // Honest credibility numbers (from CV — no fabricated metrics)
   stats: [
     { value: "15+", label: "років досвіду" },
@@ -186,9 +197,10 @@ export const brand = {
     years: "2002—2007",
   },
 
+  // Order matches how the sections appear on the page (About → Projects → …).
   nav: [
-    { label: "Проєкти", href: "#work" },
     { label: "Про мене", href: "#about" },
+    { label: "Проєкти", href: "#work" },
     { label: "Процес", href: "#process" },
     { label: "Контакт", href: "#contact" },
   ],

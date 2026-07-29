@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# working source comps — huge PSD/PNG, must never be published
+# (leading "!" escaped: in gitignore an unescaped "!" means negation)
+/\!!!-do-not-deploy/
+
+# raw source video — the optimized cut the site actually loads is /public/hero.mp4
+/assets/video/
