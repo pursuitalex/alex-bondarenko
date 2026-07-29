@@ -83,12 +83,6 @@ export function OfferBanner({ dict }: { dict: Dict }) {
                     <ArrowUpRight size={18} weight="bold" />
                   </button>
                 </Magnetic>
-                <a
-                  href="#work"
-                  className="text-[16px] text-white/60 transition-colors hover:text-white sm:text-[18px]"
-                >
-                  {dict.ctaSecondary}
-                </a>
               </div>
             </div>
           </div>
