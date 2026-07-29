@@ -13,20 +13,21 @@ import { TechStack } from "@/components/tech-stack";
 /**
  * Two-phase hero → TechStack sequence:
  *
- *  PHASE 1 — pinned video scrub (unchanged): the hero is stuck inside a tall
- *  `[data-scrub-track]`; scrolling it keeps the page put while the background
- *  video scrubs 0 → end (see HeroScrubVideo). The pin releases as the video ends.
+ *  PHASE 1 — pinned video scrub, DESKTOP ONLY: the hero is stuck inside a tall
+ *  `[data-scrub-track]` (250dvh = one viewport + 150 of scrub); scrolling it
+ *  keeps the page put while the background video scrubs 0 → end (see
+ *  HeroScrubVideo). The pin releases as the video ends. Phone/tablet skip this
+ *  entirely — their backdrop is a static photo, so there is nothing to scrub.
  *
- *  PHASE 2 — logos reveal from under: once the pin releases and the stack starts
+ *  PHASE 2 — logos reveal from under (all viewports): once the stack starts
  *  entering, the hero recedes upward (`heroY`, applied to a wrapper INSIDE the
  *  sticky so it stays 0 while pinned) by exactly the stack's tuck amount, and the
  *  stack scales 0.94 → 1 — so the logos emerge from beneath the hero as before.
  *  Both driven by the stack's own scroll progress, so nothing moves during the pin.
  *
- * Knobs: SCRUB_VH (pin/scrub length), the tuck `-mt-[35vh]` = `heroY` recede
- * (keep equal), and the reveal offset below.
+ * Knobs: the track's `lg:h-[250dvh]` (pin/scrub length), the tuck `-mt-[35vh]`
+ * = `heroY` recede (keep equal), and the reveal offset below.
  */
-const SCRUB_VH = 150;
 
 export function HeroStackReveal() {
   const stackRef = useRef<HTMLDivElement>(null);
@@ -54,17 +55,16 @@ export function HeroStackReveal() {
 
   return (
     <>
-      {/* PHASE 1 — pinned hero + video scrub */}
-      <div
-        data-scrub-track
-        className="relative z-20"
-        style={{ height: `${100 + SCRUB_VH}dvh` }}
-      >
-        <div data-pin className="sticky top-0 h-[100dvh]">
+      {/* PHASE 1 — pinned hero + video scrub. Desktop only: phone/tablet get a
+          static backdrop (see HeroBackground), so there is nothing to scrub and
+          pinning would just be dead scroll. Below lg the hero is a plain
+          section and the reveal below still works unchanged. */}
+      <div data-scrub-track className="relative z-20 lg:h-[250dvh]">
+        <div data-pin className="lg:sticky lg:top-0 lg:h-[100dvh]">
           {/* heroY recede lives INSIDE the sticky → 0 while pinned, recedes after */}
           <motion.div
             style={{ y: heroY }}
-            className="h-full origin-top will-change-transform [&>section]:h-full"
+            className="origin-top will-change-transform lg:h-full lg:[&>section]:h-full"
           >
             <Hero />
           </motion.div>
