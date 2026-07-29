@@ -19,7 +19,7 @@ export function HeroCard() {
       <div className="w-[130px] shrink-0 overflow-hidden rounded-[20px] border-[6px] border-white">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="/pic-photo.png"
+          src="/pic-photo.webp"
           alt={brand.fullName}
           className="h-full w-full object-cover"
         />

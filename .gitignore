@@ -44,5 +44,12 @@ next-env.d.ts
 # (leading "!" escaped: in gitignore an unescaped "!" means negation)
 /\!!!-do-not-deploy/
 
-# raw source video — the optimized cut the site actually loads is /public/hero.mp4
+# Image/video ORIGINALS — kept locally only, never pushed. `npm run images`
+# re-encodes them into /public (WebP), and /public is what the site serves.
+# The .ts files under assets/ are NOT ignored: src/ imports them, so dropping
+# them from git would break the production build.
+/assets/**/*.png
+/assets/**/*.jpg
+/assets/**/*.jpeg
+/assets/**/*.psd
 /assets/video/

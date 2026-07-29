@@ -53,7 +53,7 @@ export function Projects() {
                   <div className="relative h-[260px] overflow-hidden rounded-[16px] bg-ink/5 sm:h-[340px] lg:h-[390px]">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
-                      src={`/projects/${n}.png`}
+                      src={`/projects/${n}.webp`}
                       alt={p.name}
                       className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
                       loading="lazy"

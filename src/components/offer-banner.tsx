@@ -40,7 +40,7 @@ export function OfferBanner() {
               <div className="absolute inset-0 bg-[#db5400]" />
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/orange-comps.png"
+                src="/orange-comps.webp"
                 alt=""
                 className="absolute inset-0 size-full object-cover object-bottom"
               />

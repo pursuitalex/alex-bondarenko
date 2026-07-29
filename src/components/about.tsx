@@ -24,7 +24,7 @@ export function About() {
             <div className="relative h-[300px] w-full shrink-0 overflow-hidden rounded-[20px] bg-[#ba6c6c] sm:h-[400px] lg:h-auto lg:w-1/2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/walking.png"
+                src="/walking.webp"
                 alt="Олександр Бондаренко"
                 className="absolute inset-0 h-full w-full object-cover"
               />

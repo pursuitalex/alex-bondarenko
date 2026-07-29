@@ -120,7 +120,7 @@ export function HeroReveal() {
       {/* base photo */}
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
-        src="/hero-bg.png"
+        src="/hero-bg.webp"
         alt=""
         className="absolute inset-0 h-full w-full object-cover object-center"
       />
@@ -170,7 +170,7 @@ export function HeroReveal() {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/hero-bg2.png"
+                src="/hero-bg2.webp"
                 alt=""
                 className="absolute inset-0 h-full w-full object-cover object-center"
               />
