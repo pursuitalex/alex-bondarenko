@@ -31,7 +31,7 @@ export function ForWhom({ dict }: { dict: Dict }) {
             <Eyebrow label={dict.eyebrows.forWhom} />
           </Reveal>
           <ScrollRevealText
-            text="{dict.forWhomSub}"
+            text={dict.forWhomSub}
             className="max-w-[881px] text-[clamp(2rem,5.5vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em]"
           />
         </div>
