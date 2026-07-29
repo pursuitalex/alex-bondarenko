@@ -1,13 +1,14 @@
 import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
+import { WorkCollage } from "@/components/work-collage";
 import { brand } from "@/lib/brand";
 import { contentWide } from "@/lib/layout";
 
 /**
  * "Процес — Як я веду проєкт" (Figma 14:1215). Two columns at wide width:
  * left = numbered timeline (01–04), each row fades up on enter; right = the
- * media panel. The Figma media is a tilted screenshot collage we'll animate
- * later — for now the right column is a dark placeholder card (see TODO).
+ * media panel — a window onto the tilted, endlessly drifting collage of work
+ * previews (see WorkCollage).
  */
 export function Process() {
   return (
@@ -50,25 +51,9 @@ export function Process() {
             ))}
           </div>
 
-          {/* right: media — TODO replace with animated screenshot collage (Figma 40:4029) */}
+          {/* right: drifting collage of work previews */}
           <Reveal delay={0.1}>
-            <div className="relative aspect-[586/553] w-full overflow-hidden rounded-[20px] bg-ink">
-              {/* soft glow so the panel isn't flat */}
-              <div className="absolute -left-1/5 top-0 h-2/3 w-3/4 rounded-full bg-white/[0.05] blur-3xl" />
-              {/* placeholder hint */}
-              <div className="absolute inset-0 flex flex-col items-center justify-center gap-4">
-                <div className="flex size-14 items-center justify-center rounded-2xl border border-white/15">
-                  <svg viewBox="0 0 24 24" fill="none" aria-hidden className="size-6 text-white/40">
-                    <rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" strokeWidth="1.6" />
-                    <circle cx="8.5" cy="9" r="1.6" fill="currentColor" />
-                    <path d="M21 15l-5-4-7 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-                  </svg>
-                </div>
-                <p className="font-mono text-[11px] uppercase tracking-[2.2px] text-white/35">
-                  Анімація — скоро
-                </p>
-              </div>
-            </div>
+            <WorkCollage />
           </Reveal>
         </div>
       </div>

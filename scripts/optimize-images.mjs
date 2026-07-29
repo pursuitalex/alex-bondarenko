@@ -26,6 +26,7 @@ const DIRS = [
   ["assets/projects/logos", "public/projects/logos"],
   ["assets/icons", "public"],
   ["assets/icons/tech-icons", "public/tech-icons"],
+  ["assets/work-previews", "public/work-previews"],
 ];
 
 const RASTER = /\.(png|jpe?g)$/i;
