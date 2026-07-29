@@ -1,4 +1,4 @@
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 import { contentWide } from "@/lib/layout";
 
 /**
@@ -6,7 +6,7 @@ import { contentWide } from "@/lib/layout";
  * (contentWide — central 10 of 12 cols). 4×3 white borderless cards on the
  * #f5f5f5 page; name (responsive, vertically centered) + 40px icon @ 60%.
  */
-export function TechStack() {
+export function TechStack({ dict }: { dict: Dict }) {
   return (
     <section
       id="stack"
@@ -15,7 +15,7 @@ export function TechStack() {
       <div
         className={`${contentWide} grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-4`}
       >
-        {brand.stack.map((t) => (
+        {dict.stack.map((t) => (
           <article
             key={t.name}
             className="flex items-center gap-3 rounded-[20px] bg-paper-pure px-5 py-7 sm:px-9 sm:py-11"

@@ -8,6 +8,7 @@ import {
   useReducedMotion,
 } from "framer-motion";
 import { Hero } from "@/components/hero";
+import type { Dict } from "@/lib/dict";
 import { TechStack } from "@/components/tech-stack";
 import { useMediaQuery, LG } from "@/lib/use-media-query";
 
@@ -37,7 +38,7 @@ import { useMediaQuery, LG } from "@/lib/use-media-query";
  * Knobs: the track's `lg:h-[250dvh]` (pin/scrub length), the tuck `-mt-[35vh]`
  * = `heroY` recede (keep equal), and the reveal offset below.
  */
-export function HeroStackReveal() {
+export function HeroStackReveal({ dict }: { dict: Dict }) {
   const stackRef = useRef<HTMLDivElement>(null);
   const reduce = useReducedMotion();
   const isDesktop = useMediaQuery(LG);
@@ -57,9 +58,9 @@ export function HeroStackReveal() {
   if (reduce) {
     return (
       <>
-        <Hero />
+        <Hero dict={dict} />
         <div className="mt-3">
-          <TechStack />
+          <TechStack dict={dict} />
         </div>
       </>
     );
@@ -75,7 +76,7 @@ export function HeroStackReveal() {
             style={animate ? { y: heroY } : undefined}
             className="origin-top will-change-transform lg:h-full lg:[&>section]:h-full"
           >
-            <Hero />
+            <Hero dict={dict} />
           </motion.div>
         </div>
       </div>
@@ -87,7 +88,7 @@ export function HeroStackReveal() {
           style={animate ? { scale: stackScale } : undefined}
           className="origin-top will-change-transform"
         >
-          <TechStack />
+          <TechStack dict={dict} />
         </motion.div>
       </div>
     </>

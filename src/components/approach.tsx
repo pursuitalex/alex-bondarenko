@@ -5,7 +5,7 @@ import { Eyebrow } from "@/components/eyebrow";
 import { Magnetic } from "@/components/magnetic";
 import { Reveal } from "@/components/reveal";
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 import { contentWide } from "@/lib/layout";
 
 function openContact() {
@@ -16,8 +16,8 @@ function openContact() {
  * Approach intro (Figma 19:53): eyebrow + large scroll-revealed heading on the
  * left; a short note + orange CTA bottom-right. Wide content width.
  */
-export function Approach() {
-  const a = brand.approach;
+export function Approach({ dict }: { dict: Dict }) {
+  const a = dict.approach;
 
   return (
     <section id="approach" className="pb-14 sm:pb-20 lg:pb-28">
@@ -47,7 +47,7 @@ export function Approach() {
                   onClick={openContact}
                   className="inline-flex h-[52px] items-center gap-3 rounded-full bg-accent px-6 text-[16px] font-medium text-white transition-opacity hover:opacity-90 lg:h-[60px] lg:px-7 lg:text-[18px]"
                 >
-                  {brand.cta}
+                  {dict.cta}
                   <ArrowUpRight size={18} weight="bold" />
                 </button>
               </Magnetic>

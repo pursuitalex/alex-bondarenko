@@ -2,7 +2,7 @@ import { Eyebrow } from "@/components/eyebrow";
 import { Marquee } from "@/components/marquee";
 import { Reveal } from "@/components/reveal";
 import { ScrollRevealText } from "@/components/scroll-reveal-text";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 import { contentWide } from "@/lib/layout";
 
 /**
@@ -10,7 +10,7 @@ import { contentWide } from "@/lib/layout";
  * 2×2 grid of segment cards (title + pain + orange-dot outcome + icon).
  * Wide content width; each piece appears with the shared animation helpers.
  */
-export function ForWhom() {
+export function ForWhom({ dict }: { dict: Dict }) {
   return (
     <section id="for-whom" className="relative py-16 sm:py-20 lg:py-28">
       {/* diagonal running ticker (Figma 52:12026) — absolute, full-bleed (w-screen),
@@ -21,24 +21,24 @@ export function ForWhom() {
         aria-hidden
         className="pointer-events-none absolute bottom-0 left-1/2 z-10 w-[110vw] -translate-x-1/2 translate-y-1/2 -rotate-[4deg]"
       >
-        <Marquee items={brand.ticker} />
+        <Marquee items={dict.ticker} />
       </div>
 
       <div className={contentWide}>
         {/* header */}
         <div className="flex flex-col gap-6 sm:gap-8">
           <Reveal>
-            <Eyebrow label="Для кого" />
+            <Eyebrow label={dict.eyebrows.forWhom} />
           </Reveal>
           <ScrollRevealText
-            text="Рішення під твою задачу — від першого екрана до продажу."
+            text="{dict.forWhomSub}"
             className="max-w-[881px] text-[clamp(2rem,5.5vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em]"
           />
         </div>
 
         {/* 2×2 segment cards */}
         <div className="mt-10 grid grid-cols-1 gap-2 sm:mt-12 sm:grid-cols-2">
-          {brand.segments.map((s, i) => (
+          {dict.segments.map((s, i) => (
             <Reveal
               key={s.title}
               delay={(i % 2) * 0.08}

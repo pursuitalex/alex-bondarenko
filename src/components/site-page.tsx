@@ -9,43 +9,49 @@ import { OfferBanner } from "@/components/offer-banner";
 import { Faq } from "@/components/faq";
 import { Contact } from "@/components/contact";
 import { Reveal } from "@/components/reveal";
+import type { Dict } from "@/lib/dict";
 
-export default function Home() {
+/**
+ * The whole landing page, in one language. Both routes render this — `/` with
+ * the Ukrainian dictionary, `/en` with the English one — so the composition
+ * lives in exactly one place and cannot drift between the two versions.
+ */
+export function SitePage({ dict }: { dict: Dict }) {
   return (
     <main className="flex flex-col gap-3 overflow-x-clip px-2.5 pt-2.5 pb-2.5 sm:gap-4 sm:px-3 sm:pt-3 sm:pb-3">
       {/* hero + tech-stack scroll choreography (hero recedes, stack emerges from under) */}
-      <HeroStackReveal />
+      <HeroStackReveal dict={dict} />
 
       {/* approach intro (Figma 19:53) */}
-      <Approach />
+      <Approach dict={dict} />
 
       {/* wide accent */}
       <Reveal>
-        <About />
+        <About dict={dict} />
       </Reveal>
 
       {/* for whom — wide content (Figma 14:998) */}
-      <ForWhom />
+      <ForWhom dict={dict} />
 
       {/* projects — wide content (Figma 14:1825) */}
-      <Projects />
+      <Projects dict={dict} />
 
       {/* wide accent */}
       <Reveal>
-        <Services />
+        <Services dict={dict} />
       </Reveal>
 
       {/* process — wide content (Figma 14:1215) */}
-      <Process />
+      <Process dict={dict} />
 
       {/* orange CTA banner — wide content (Figma 49:19186) */}
-      <OfferBanner />
+      <OfferBanner dict={dict} />
 
       {/* faq — wide content (Figma 49:19079) */}
-      <Faq />
+      <Faq dict={dict} />
 
       {/* closing CTA + footer — full-bleed dark panel (Figma 14:1291) */}
-      <Contact />
+      <Contact dict={dict} />
     </main>
   );
 }

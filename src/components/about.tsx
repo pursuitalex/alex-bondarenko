@@ -1,7 +1,7 @@
 import { CountUp } from "@/components/count-up";
 import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 
 /**
  * About / Experience (Figma 14:924) — dark rounded panel.
@@ -11,7 +11,7 @@ import { brand } from "@/lib/brand";
  * Row 3: "Досвід" label (1 col) + experience timeline (3 cols), each item
  *        fading up on scroll.
  */
-export function About() {
+export function About({ dict }: { dict: Dict }) {
   return (
     <section
       id="about"
@@ -25,17 +25,17 @@ export function About() {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/walking.webp"
-                alt="Олександр Бондаренко"
+                alt={dict.ui.photoAlt}
                 className="absolute inset-0 h-full w-full object-cover"
               />
             </div>
           </div>
 
           <div className="flex flex-1 flex-col gap-6 sm:gap-8">
-            <Eyebrow label="Про мене" tone="dark" />
+            <Eyebrow label={dict.eyebrows.about} tone="dark" />
             <Reveal>
               <h2 className="text-[clamp(1.6rem,3.4vw,2.6rem)] font-medium leading-[1.27] tracking-[-0.025em] text-white">
-                {brand.about}
+                {dict.about}
               </h2>
             </Reveal>
           </div>
@@ -43,7 +43,7 @@ export function About() {
 
         {/* Row 2 — stats (count-up) */}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-10 border-t border-white/20 pt-10 lg:grid-cols-4">
-          {brand.stats.map((s) => (
+          {dict.stats.map((s) => (
             <div key={s.label} className="flex flex-col gap-3">
               <dd className="text-[clamp(2.5rem,5.5vw,4.5rem)] font-semibold leading-none tracking-[-0.025em] text-white">
                 <CountUp value={s.value} />
@@ -58,10 +58,10 @@ export function About() {
         {/* Row 3 — experience (each item fades up) */}
         <div className="grid grid-cols-1 gap-4 pt-14 lg:grid-cols-4">
           <p className="font-mono text-[10px] uppercase leading-[16.5px] tracking-[1.2px] text-white/70 sm:text-[12px]">
-            Досвід
+            {dict.eyebrows.experience}
           </p>
           <div className="lg:col-span-3">
-            {brand.experience.map((job) => (
+            {dict.experience.map((job) => (
               <Reveal
                 key={`${job.period}-${job.company}`}
                 className="grid grid-cols-1 gap-2 border-t border-white/10 py-6 sm:grid-cols-[136px_1fr] sm:gap-10"

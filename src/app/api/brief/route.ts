@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import { brand } from "@/lib/brand";
+import { shared } from "@/lib/brand";
 
 /**
  * Brief form → inbox, via Resend.
@@ -21,15 +21,42 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const clean = (v: unknown, max: number) =>
   typeof v === "string" ? v.trim().slice(0, max) : "";
 
+/**
+ * The form posts which language it is showing, so a visitor on /en does not get
+ * an error back in Ukrainian. Anything unrecognised falls back to Ukrainian.
+ */
+const MESSAGES = {
+  uk: {
+    badRequest: "Некоректний запит.",
+    required: "Заповніть ім'я, email і тип проєкту.",
+    badEmail: "Перевірте email.",
+    unavailable: (to: string) =>
+      `Пошта тимчасово недоступна. Напишіть напряму на ${to}`,
+    failed: (to: string) => `Не вдалося надіслати. Напишіть напряму на ${to}`,
+  },
+  en: {
+    badRequest: "Malformed request.",
+    required: "Please fill in your name, email and project type.",
+    badEmail: "Check the email address.",
+    unavailable: (to: string) =>
+      `Email is temporarily unavailable. Write to ${to} directly`,
+    failed: (to: string) => `Couldn't send that. Write to ${to} directly`,
+  },
+};
+
+const messagesFor = (v: unknown) =>
+  v === "en" ? MESSAGES.en : MESSAGES.uk;
+
 export async function POST(request: Request) {
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return Response.json({ error: "Некоректний запит." }, { status: 400 });
+    return Response.json({ error: MESSAGES.uk.badRequest }, { status: 400 });
   }
 
   const data = (body ?? {}) as Record<string, unknown>;
+  const t = messagesFor(data.lang);
 
   // Honeypot: a real person never sees this field, so anything in it is a bot.
   // Answer 200 so the bot logs a success and does not retry.
@@ -43,12 +70,12 @@ export async function POST(request: Request) {
 
   if (!name || !email || !type) {
     return Response.json(
-      { error: "Заповніть ім'я, email і тип проєкту." },
+      { error: t.required },
       { status: 400 },
     );
   }
   if (!EMAIL_RE.test(email)) {
-    return Response.json({ error: "Перевірте email." }, { status: 400 });
+    return Response.json({ error: t.badEmail }, { status: 400 });
   }
 
   // Config is checked after validation: bad input is the client's error whether
@@ -58,7 +85,7 @@ export async function POST(request: Request) {
   if (!apiKey) {
     console.error("[brief] RESEND_API_KEY is not set");
     return Response.json(
-      { error: "Пошта тимчасово недоступна. Напишіть напряму на " + brand.email },
+      { error: t.unavailable(shared.email) },
       { status: 503 },
     );
   }
@@ -76,7 +103,7 @@ export async function POST(request: Request) {
   try {
     const { error } = await new Resend(apiKey).emails.send({
       from: process.env.BRIEF_FROM ?? "Заявка з сайту <onboarding@resend.dev>",
-      to: process.env.BRIEF_TO ?? brand.contacts.email,
+      to: process.env.BRIEF_TO ?? shared.contacts.email,
       replyTo: email,
       subject: `Заявка: ${name} — ${type}`,
       text: lines.join("\n"),
@@ -85,14 +112,14 @@ export async function POST(request: Request) {
     if (error) {
       console.error("[brief] resend rejected the message:", error);
       return Response.json(
-        { error: "Не вдалося надіслати. Напишіть напряму на " + brand.email },
+        { error: t.failed(shared.email) },
         { status: 502 },
       );
     }
   } catch (err) {
     console.error("[brief] resend request failed:", err);
     return Response.json(
-      { error: "Не вдалося надіслати. Напишіть напряму на " + brand.email },
+      { error: t.failed(shared.email) },
       { status: 502 },
     );
   }

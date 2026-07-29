@@ -1,6 +1,6 @@
 "use client";
 
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 
 const swapEase = "ease-[cubic-bezier(0.16,1,0.3,1)]";
 
@@ -57,10 +57,12 @@ export function Header({
   menuOpen,
   onToggleMenu,
   onOpenMenu,
+  dict,
 }: {
   menuOpen: boolean;
   onToggleMenu: () => void;
   onOpenMenu: () => void;
+  dict: Dict;
 }) {
   return (
     <header className="sticky top-0 z-40 bg-paper/80 backdrop-blur-md">
@@ -70,11 +72,11 @@ export function Header({
           href="#top"
           className="text-[16px] font-semibold tracking-tight sm:text-[18px]"
         >
-          {brand.wordmark}
+          {dict.wordmark}
           <span className="text-accent">®</span>
         </a>
 
-        {brand.nav.map((item, i) => {
+        {dict.nav.map((item, i) => {
           const index = String(i + 1).padStart(2, "0");
           return item.href === "#contact" ? (
             <NavItem
@@ -96,7 +98,7 @@ export function Header({
         <button
           onClick={onToggleMenu}
           aria-expanded={menuOpen}
-          aria-label={menuOpen ? "Закрити меню" : "Відкрити меню"}
+          aria-label={menuOpen ? dict.ui.closeMenu : dict.ui.openMenu}
           className="-m-2 flex items-center p-2 transition-opacity hover:opacity-60"
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

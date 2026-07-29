@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLenis } from "lenis/react";
 import { X, ArrowUpRight, Check } from "@phosphor-icons/react";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -18,8 +18,6 @@ type FormState = {
 
 const EMPTY: FormState = { name: "", email: "", type: "", budget: "", message: "" };
 
-const GENERIC_ERROR =
-  "Не вдалося надіслати. Спробуйте ще раз або напишіть напряму на пошту нижче.";
 
 const chip = (active: boolean) =>
   `rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
@@ -36,9 +34,11 @@ const label = "font-mono text-[11px] uppercase tracking-[0.2em] text-muted";
 export function ContactMenu({
   open,
   onClose,
+  dict,
 }: {
   open: boolean;
   onClose: () => void;
+  dict: Dict;
 }) {
   const lenis = useLenis();
   const [form, setForm] = useState<FormState>(EMPTY);
@@ -71,7 +71,7 @@ export function ContactMenu({
     e.preventDefault();
     if (sending) return;
     if (!form.name.trim() || !form.email.trim() || !form.type) {
-      setError("Заповніть ім'я, email і тип проєкту.");
+      setError(dict.ui.errorRequired);
       return;
     }
 
@@ -81,18 +81,18 @@ export function ContactMenu({
       const res = await fetch("/api/brief", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, company }),
+        body: JSON.stringify({ ...form, company, lang: dict.lang }),
       });
       // Only claim it was sent once the server says so — the whole point of
       // wiring this up was that the old version confirmed unconditionally.
       const data = await res.json().catch(() => null);
       if (!res.ok || !data?.ok) {
-        setError(data?.error || GENERIC_ERROR);
+        setError(data?.error || dict.ui.errorGeneric);
         return;
       }
       setSent(true);
     } catch {
-      setError(GENERIC_ERROR);
+      setError(dict.ui.errorGeneric);
     } finally {
       setSending(false);
     }
@@ -123,7 +123,7 @@ export function ContactMenu({
             data-lenis-prevent
             role="dialog"
             aria-modal="true"
-            aria-label="Заявка на проєкт"
+            aria-label={dict.ui.briefDialogLabel}
             className="absolute right-0 top-0 flex h-[100dvh] w-full flex-col overflow-y-auto bg-ink-soft p-5 text-paper sm:bottom-2 sm:right-2 sm:top-2 sm:h-auto sm:max-h-[calc(100dvh-1rem)] sm:w-[460px] sm:rounded-frame sm:p-7"
             initial={{ x: "100%" }}
             animate={{ x: 0 }}
@@ -131,10 +131,10 @@ export function ContactMenu({
             transition={{ duration: 0.5, ease: EASE }}
           >
             <div className="flex items-center justify-between">
-              <span className={label}>(Заявка)</span>
+              <span className={label}>{dict.ui.briefBadge}</span>
               <button
                 onClick={onClose}
-                aria-label="Закрити"
+                aria-label={dict.ui.close}
                 className="flex size-9 items-center justify-center rounded-full border border-white/15 transition-colors hover:border-accent hover:text-accent"
               >
                 <X weight="bold" className="size-4" />
@@ -147,34 +147,34 @@ export function ContactMenu({
                   <Check weight="bold" className="size-6" />
                 </span>
                 <h2 className="text-2xl font-semibold tracking-tight">
-                  Дякую, {form.name.split(" ")[0]}!
+                  {dict.ui.thanks}, {form.name.split(" ")[0]}!
                 </h2>
                 <p className="max-w-xs text-paper/70">
-                  Заявку отримав. Відповім на {form.email} протягом 24 годин.
+                  {dict.ui.thanksBody.replace("{email}", form.email)}
                 </p>
                 <button
                   onClick={onClose}
                   className="mt-2 rounded-full bg-paper px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-accent hover:text-white"
                 >
-                  Закрити
+                  {dict.ui.close}
                 </button>
               </div>
             ) : (
               <>
                 <div className="mt-8">
                   <h2 className="text-3xl font-semibold tracking-tight">
-                    {brand.brief.heading}
+                    {dict.brief.heading}
                   </h2>
-                  <p className="mt-2 text-sm text-paper/60">{brand.brief.sub}</p>
+                  <p className="mt-2 text-sm text-paper/60">{dict.brief.sub}</p>
                 </div>
 
                 <form onSubmit={submit} className="mt-7 flex flex-col gap-5">
                   <label className="flex flex-col gap-2">
-                    <span className={label}>Ім&apos;я</span>
+                    <span className={label}>{dict.ui.fieldName}</span>
                     <input
                       value={form.name}
                       onChange={(e) => set("name", e.target.value)}
-                      placeholder="Як до вас звертатися"
+                      placeholder={dict.ui.namePlaceholder}
                       className={field}
                     />
                   </label>
@@ -191,9 +191,9 @@ export function ContactMenu({
                   </label>
 
                   <div className="flex flex-col gap-2">
-                    <span className={label}>Тип проєкту</span>
+                    <span className={label}>{dict.ui.fieldType}</span>
                     <div className="flex flex-wrap gap-2">
-                      {brand.brief.projectTypes.map((t) => (
+                      {dict.brief.projectTypes.map((t) => (
                         <button
                           type="button"
                           key={t}
@@ -208,11 +208,11 @@ export function ContactMenu({
 
                   <div className="flex flex-col gap-2">
                     <span className={label}>
-                      Бюджет{" "}
-                      <span className="normal-case text-muted/60">(необов&apos;язково)</span>
+                      {dict.ui.fieldBudget}{" "}
+                      <span className="normal-case text-muted/60">{dict.ui.optional}</span>
                     </span>
                     <div className="flex flex-wrap gap-2">
-                      {brand.brief.budgets.map((b) => (
+                      {dict.brief.budgets.map((b) => (
                         <button
                           type="button"
                           key={b}
@@ -226,12 +226,12 @@ export function ContactMenu({
                   </div>
 
                   <label className="flex flex-col gap-2">
-                    <span className={label}>Про проєкт</span>
+                    <span className={label}>{dict.ui.fieldMessage}</span>
                     <textarea
                       value={form.message}
                       onChange={(e) => set("message", e.target.value)}
                       rows={3}
-                      placeholder="Кілька речень про задачу, дедлайн, посилання…"
+                      placeholder={dict.ui.messagePlaceholder}
                       className={`${field} resize-none`}
                     />
                   </label>
@@ -260,7 +260,7 @@ export function ContactMenu({
                     aria-busy={sending}
                     className="group mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-paper px-6 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-accent hover:text-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-paper disabled:hover:text-ink"
                   >
-                    {sending ? "Надсилаю…" : "Надіслати заявку"}
+                    {sending ? dict.ui.sending : dict.ui.submit}
                     {!sending && (
                       <ArrowUpRight
                         weight="bold"
@@ -271,12 +271,12 @@ export function ContactMenu({
                 </form>
 
                 <div className="mt-7 border-t border-white/10 pt-5">
-                  <p className={label}>Або напряму</p>
+                  <p className={label}>{dict.ui.orDirectly}</p>
                   <a
-                    href={`mailto:${brand.email}`}
+                    href={`mailto:${dict.email}`}
                     className="mt-1 inline-block underline-offset-4 hover:text-accent hover:underline"
                   >
-                    {brand.email}
+                    {dict.email}
                   </a>
                 </div>
               </>

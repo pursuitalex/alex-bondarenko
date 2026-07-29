@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
 import { contentWide } from "@/lib/layout";
-import { faq, faqHeading, faqSub } from "@/content/faq";
+import type { Dict } from "@/lib/dict";
 
 /**
  * "Часті запитання та Відповіді" (Figma 49:19079). Two columns at wide width:
@@ -12,9 +12,9 @@ import { faq, faqHeading, faqSub } from "@/content/faq";
  * (question + animated +/− toggle, smooth height reveal). Single-open accordion;
  * answers stay in the DOM (height-collapsed) for SEO/a11y.
  *
- * Copy (heading, subtitle, Q&A) is edited in src/content/faq.ts.
+ * Copy (heading, subtitle, Q&A) is edited in src/content/uk.ts and en.ts.
  */
-export function Faq() {
+export function Faq({ dict }: { dict: Dict }) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
@@ -24,17 +24,17 @@ export function Faq() {
           {/* left — intro */}
           <div className="flex flex-col gap-8">
             <Reveal>
-              <Eyebrow label="Часті запитання" />
+              <Eyebrow label={dict.eyebrows.faq} />
             </Reveal>
             <div className="flex flex-col gap-6">
               <Reveal>
                 <h2 className="text-[clamp(2rem,5.5vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-ink">
-                  {faqHeading}
+                  {dict.faqHeading}
                 </h2>
               </Reveal>
               <Reveal>
                 <p className="max-w-[432px] text-[16px] leading-[1.5] tracking-[-0.3px] text-muted-ink sm:text-[18px] sm:leading-[1.4]">
-                  {faqSub}
+                  {dict.faqSub}
                 </p>
               </Reveal>
             </div>
@@ -42,7 +42,7 @@ export function Faq() {
 
           {/* right — accordion */}
           <div className="flex flex-col gap-2">
-            {faq.map((item, i) => {
+            {dict.faq.map((item, i) => {
               const isOpen = open === i;
               return (
                 <Reveal key={item.q} delay={i * 0.05}>

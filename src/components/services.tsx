@@ -1,13 +1,13 @@
 import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 
 /**
  * "Послуги" (Figma 14:1130) — wide dark panel. Border-divided rows, each:
  * orange arrow icon + title/desc + larger interactive tag pills. Each row
  * fades up on scroll (Reveal). Tags brighten to accent on hover.
  */
-export function Services() {
+export function Services({ dict }: { dict: Dict }) {
   return (
     <section
       id="services"
@@ -16,7 +16,7 @@ export function Services() {
       <div className="px-5 py-16 sm:px-8 sm:py-20 lg:px-[52px] lg:py-28">
         {/* header */}
         <div className="flex flex-col gap-6 sm:gap-8">
-          <Eyebrow label="Послуги" tone="dark" />
+          <Eyebrow label={dict.eyebrows.services} tone="dark" />
           <h2 className="text-[clamp(2rem,5.5vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-white">
             Що я роблю
           </h2>
@@ -24,7 +24,7 @@ export function Services() {
 
         {/* rows */}
         <div className="mt-12 border-t border-white/10 sm:mt-14">
-          {brand.services.map((s) => (
+          {dict.services.map((s) => (
             <Reveal
               key={s.title}
               className="grid grid-cols-1 gap-y-5 border-b border-white/10 py-8 lg:grid-cols-[133px_1fr_1fr] lg:items-start lg:gap-x-4 lg:gap-y-0 lg:py-9"

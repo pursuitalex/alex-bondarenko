@@ -1,6 +1,6 @@
 "use client";
 
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 
 function openContact() {
   window.dispatchEvent(new CustomEvent("open-contact"));
@@ -12,7 +12,7 @@ function openContact() {
  * Height is flexible (min-h-[160px]) so it adapts when the column narrows
  * (e.g. at 1440 the right column is 25% / 3-of-12 cols). Plain <img>.
  */
-export function HeroCard() {
+export function HeroCard({ dict }: { dict: Dict }) {
   return (
     <div className="flex w-full items-stretch text-ink">
       {/* photo block — white frame, stretches to card height */}
@@ -20,7 +20,7 @@ export function HeroCard() {
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/pic-photo.webp"
-          alt={brand.fullName}
+          alt={dict.fullName}
           className="h-full w-full object-cover"
         />
       </div>
@@ -29,22 +29,22 @@ export function HeroCard() {
       <div className="flex min-h-[160px] flex-1 flex-col justify-between gap-3 rounded-[20px] bg-white p-5">
         <div className="flex flex-col gap-1">
           <p className="text-[11px] font-semibold leading-[15px] tracking-[-0.22px] text-[#5b5b5b]">
-            Дизайнер &amp; веброзробник
+            {dict.tagline}
           </p>
           <p className="text-xl font-semibold leading-[1.05] tracking-[-0.45px] text-[#0a0a0a]">
-            {brand.fullName}
+            {dict.fullName}
           </p>
         </div>
 
         <p className="font-mono text-[11px] font-semibold leading-[15px] tracking-[-0.22px] text-[#5b5b5b]">
-          {brand.contacts.email}
+          {dict.contacts.email}
         </p>
 
         <button
           onClick={openContact}
           className="group inline-flex w-fit items-center gap-2 rounded-full bg-[#0a0a0a] px-4 py-2 text-sm font-medium text-white transition-colors duration-300 hover:bg-accent"
         >
-          Поговоримо
+          {dict.ui.letsTalk}
           <span className="size-1.5 rounded-full bg-accent transition-colors duration-300 group-hover:bg-white" />
         </button>
       </div>

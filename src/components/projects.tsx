@@ -1,23 +1,22 @@
 import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 import { contentWide } from "@/lib/layout";
-import { projects } from "@/content/projects";
 
 /**
- * Selected projects (Figma 14:1825). Labels come from src/content/projects.ts
- * (easy-edit file); photo/logo are matched by position — entry i → /projects/{i+1}.webp
+ * Selected projects (Figma 14:1825). Labels come from the dictionary
+ * (src/content/uk.ts, en.ts); photo/logo are matched by position — entry i → /projects/{i+1}.webp
  * and /projects/logos/{i+1}.svg. Card: white label bar (name /year + type) +
  * image (photo + dark gradient + 250px logo) with hover zoom/lift. Wide width.
  */
-export function Projects() {
+export function Projects({ dict }: { dict: Dict }) {
   return (
     <section id="work" className="py-16 sm:py-20 lg:py-28">
       <div className={contentWide}>
         {/* header */}
         <div className="flex flex-col gap-6 sm:gap-8">
           <Reveal>
-            <Eyebrow label="Портфоліо" />
+            <Eyebrow label={dict.eyebrows.work} />
           </Reveal>
           <Reveal>
             <h2 className="text-[clamp(2rem,5.5vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-ink">
@@ -28,12 +27,12 @@ export function Projects() {
 
         {/* 2-col project grid */}
         <div className="mt-10 grid grid-cols-1 gap-x-4 gap-y-8 sm:mt-12 sm:grid-cols-2 sm:gap-y-10">
-          {projects.map((p, i) => {
+          {dict.projects.map((p, i) => {
             const n = i + 1;
             return (
               <Reveal key={n} delay={(i % 2) * 0.08}>
                 <a
-                  href={brand.contacts.behance.url}
+                  href={dict.contacts.behance.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group flex flex-col gap-2 transition-transform duration-300 ease-out hover:-translate-y-1"

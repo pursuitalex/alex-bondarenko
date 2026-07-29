@@ -1,7 +1,7 @@
 import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
 import { WorkCollage } from "@/components/work-collage";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 import { contentWide } from "@/lib/layout";
 
 /**
@@ -10,18 +10,18 @@ import { contentWide } from "@/lib/layout";
  * media panel — a window onto the tilted, endlessly drifting collage of work
  * previews (see WorkCollage).
  */
-export function Process() {
+export function Process({ dict }: { dict: Dict }) {
   return (
     <section id="process" className="py-16 sm:py-20 lg:py-28">
       <div className={contentWide}>
         {/* header */}
         <div className="flex flex-col gap-6 sm:gap-8">
           <Reveal>
-            <Eyebrow label="Процес" />
+            <Eyebrow label={dict.eyebrows.process} />
           </Reveal>
           <Reveal>
             <h2 className="text-[clamp(2rem,5.5vw,3.75rem)] font-semibold leading-[1.05] tracking-[-0.03em] text-ink">
-              Як я веду проєкт
+              {dict.processHeading}
             </h2>
           </Reveal>
         </div>
@@ -32,7 +32,7 @@ export function Process() {
         <div className="mt-12 grid grid-cols-1 gap-10 sm:mt-14 lg:grid-cols-[1fr_1fr] lg:items-start lg:gap-4">
           {/* left: numbered steps */}
           <div className="border-t border-ink/10">
-            {brand.process.map((step, i) => (
+            {dict.process.map((step, i) => (
               <Reveal
                 key={step.title}
                 delay={i * 0.06}

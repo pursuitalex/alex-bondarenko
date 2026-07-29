@@ -4,7 +4,7 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 import { Magnetic } from "@/components/magnetic";
 import { Marquee } from "@/components/marquee";
 import { Reveal } from "@/components/reveal";
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 import { contentWide } from "@/lib/layout";
 
 function openContact() {
@@ -18,7 +18,7 @@ function openContact() {
  * (darken top for the eyebrow, bottom for the offer/CTA), eyebrow top-left,
  * offer copy + white CTA pill + secondary link bottom-left.
  */
-export function OfferBanner() {
+export function OfferBanner({ dict }: { dict: Dict }) {
   return (
     <section id="offer" className="relative">
       {/* white running ticker mirrored above the orange block — same stripe,
@@ -29,7 +29,7 @@ export function OfferBanner() {
         style={{ rotate: "4deg" }}
         className="pointer-events-none absolute left-1/2 top-0 z-10 w-[110vw] -translate-x-1/2 -translate-y-1/2"
       >
-        <Marquee items={brand.ticker} tone="light" />
+        <Marquee items={dict.ticker} tone="light" />
       </div>
 
       <div className={contentWide}>
@@ -65,13 +65,13 @@ export function OfferBanner() {
             {/* top: eyebrow */}
             <p className="relative font-mono text-[12px] uppercase tracking-[1.2px] opacity-90">
               <span className="text-accent">/</span>
-              <span className="text-white">{` ${brand.stats[0].value} ${brand.stats[0].label}`}</span>
+              <span className="text-white">{` ${dict.stats[0].value} ${dict.stats[0].label}`}</span>
             </p>
 
             {/* bottom: offer + CTAs */}
             <div className="relative flex w-full flex-col gap-8 sm:gap-10 lg:w-[432px] lg:gap-12">
               <p className="text-[18px] font-medium leading-[1.3] tracking-[-0.4px] text-white sm:text-[20px] sm:leading-[1.2] sm:tracking-[-0.6px]">
-                {brand.offer}
+                {dict.offer}
               </p>
               <div className="flex flex-wrap items-center gap-x-6 gap-y-4">
                 <Magnetic>
@@ -79,7 +79,7 @@ export function OfferBanner() {
                     onClick={openContact}
                     className="inline-flex h-[52px] items-center gap-2.5 rounded-full bg-white px-6 text-[16px] font-medium text-[#0a0a0a] transition-opacity hover:opacity-90 lg:h-[60px] lg:px-7 lg:text-[18px]"
                   >
-                    {brand.cta}
+                    {dict.cta}
                     <ArrowUpRight size={18} weight="bold" />
                   </button>
                 </Magnetic>
@@ -87,7 +87,7 @@ export function OfferBanner() {
                   href="#work"
                   className="text-[16px] text-white/60 transition-colors hover:text-white sm:text-[18px]"
                 >
-                  {brand.ctaSecondary}
+                  {dict.ctaSecondary}
                 </a>
               </div>
             </div>

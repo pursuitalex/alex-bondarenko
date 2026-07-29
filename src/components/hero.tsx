@@ -6,7 +6,7 @@ import { Magnetic } from "@/components/magnetic";
 import { HeroCard } from "@/components/hero-card";
 import { HeroBackground } from "@/components/hero-background";
 // import { HeroReveal } from "@/components/hero-reveal"; // cursor water-drops reveal — temporarily disabled (keep)
-import { brand } from "@/lib/brand";
+import type { Dict } from "@/lib/dict";
 
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -28,10 +28,10 @@ function openContact() {
 }
 
 /** Roles list — Geist SemiBold 20px / white 90% / 8px accent dot / 20px gap. */
-function RolesList({ className }: { className?: string }) {
+function RolesList({ dict, className }: { dict: Dict; className?: string }) {
   return (
     <ul className={`flex flex-col gap-4 ${className ?? ""}`}>
-      {brand.roles.map((role) => (
+      {dict.roles.map((role) => (
         <li
           key={role}
           className="flex items-center gap-5 text-[20px] font-medium leading-[18px] text-white/90"
@@ -44,7 +44,7 @@ function RolesList({ className }: { className?: string }) {
   );
 }
 
-export function Hero() {
+export function Hero({ dict }: { dict: Dict }) {
   const reduce = useReducedMotion();
   const initial = reduce ? "show" : "hidden";
 
@@ -70,10 +70,10 @@ export function Hero() {
         className="relative z-10 flex items-start justify-between gap-4 font-mono text-[10px] uppercase leading-[14px] tracking-[1.2px] text-white/90 sm:text-[11px] sm:leading-[15px] lg:text-[12px] lg:leading-[16.5px]"
       >
         <motion.span variants={fadeUp}>
-          <span className="text-accent">/</span> {brand.fullName} — {brand.tagline}
+          <span className="text-accent">/</span> {dict.fullName} — {dict.tagline}
         </motion.span>
         <motion.span variants={fadeUp} className="text-right">
-          <span className="text-accent">/</span> {brand.availability}
+          <span className="text-accent">/</span> {dict.availability}
         </motion.span>
       </motion.div>
 
@@ -85,7 +85,7 @@ export function Hero() {
         className="relative z-10 flex flex-col gap-10 py-6 xl:flex-row xl:items-end xl:justify-between xl:gap-6"
       >
         <h1
-          aria-label={`${brand.wordmark} — Alex — ${brand.fullName}`}
+          aria-label={`${dict.wordmark} — Alex — ${dict.fullName}`}
           className="font-semibold leading-[0.9]"
         >
           <span className="block overflow-hidden text-[clamp(2.8rem,10vw,11.25rem)] pt-[0.1em] pr-[0.14em] pb-[0.06em]">
@@ -93,7 +93,7 @@ export function Hero() {
               variants={clipUp}
               className="block tracking-[-0.08em]"
             >
-              {brand.wordmark}
+              {dict.wordmark}
               <span className="align-top text-[0.29em] text-accent">®</span>
             </motion.span>
           </span>
@@ -108,7 +108,7 @@ export function Hero() {
         </h1>
 
         <motion.div variants={fadeUp} className="shrink-0 xl:w-1/4 xl:pb-2">
-          <RolesList />
+          <RolesList dict={dict} />
         </motion.div>
       </motion.div>
 
@@ -121,7 +121,7 @@ export function Hero() {
       >
         <motion.div variants={fadeUp} className="max-w-[432px]">
           <p className="text-[20px] font-medium leading-[1.2] tracking-[-0.6px] text-white">
-            {brand.offer}
+            {dict.offer}
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
             <Magnetic className="inline-flex">
@@ -129,7 +129,7 @@ export function Hero() {
                 onClick={openContact}
                 className="group inline-flex h-[52px] items-center gap-3 rounded-full bg-white px-7 text-[16px] font-medium text-ink transition-colors duration-300 hover:bg-accent hover:text-white active:scale-[0.98] lg:h-[60px] lg:text-[18px]"
               >
-                {brand.cta}
+                {dict.cta}
                 <ArrowUpRight
                   weight="bold"
                   className="size-[18px] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -140,13 +140,13 @@ export function Hero() {
               href="#work"
               className="text-[18px] leading-[20px] text-white/60 underline-offset-4 transition-colors hover:text-white hover:underline"
             >
-              {brand.ctaSecondary}
+              {dict.ctaSecondary}
             </a>
           </div>
         </motion.div>
 
         <motion.div variants={fadeUp} className="w-full lg:w-2/5 xl:w-1/4">
-          <HeroCard />
+          <HeroCard dict={dict} />
         </motion.div>
       </motion.div>
     </section>

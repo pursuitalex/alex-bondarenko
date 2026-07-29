@@ -6,13 +6,12 @@ import { ArrowUpRight } from "@phosphor-icons/react";
 import { Eyebrow } from "@/components/eyebrow";
 import { Magnetic } from "@/components/magnetic";
 import { Reveal } from "@/components/reveal";
-import { brand } from "@/lib/brand";
+import Link from "next/link";
+import { LANGS, langLabels, localeHref, type Dict } from "@/lib/dict";
 
 function openContact() {
   window.dispatchEvent(new CustomEvent("open-contact"));
 }
-
-const [firstName, lastName] = brand.fullNameLatin.split(" ");
 
 /**
  * "Контакт" — closing full-bleed dark panel (Figma 14:1291): final CTA +
@@ -20,9 +19,10 @@ const [firstName, lastName] = brand.fullNameLatin.split(" ");
  * wordmark with meta and a (visual-only) UA/EN switch. Elements appear with the
  * shared Reveal animation. id="contact" so hero/project CTAs land here.
  */
-export function Contact() {
+export function Contact({ dict }: { dict: Dict }) {
   const ref = useRef<HTMLElement>(null);
   const reduce = useReducedMotion();
+  const [firstName, lastName] = dict.fullNameLatin.split(" ");
 
   // Content settles into place as the panel comes up: 90% → its normal size.
   // The scale sits on the inner wrapper, so the dark panel itself keeps its
@@ -47,17 +47,17 @@ export function Contact() {
         <div className="flex flex-col gap-10 pb-12 lg:flex-row lg:items-end lg:justify-between lg:pb-14">
           <div className="flex max-w-[672px] flex-col gap-7 sm:gap-8">
             <Reveal>
-              <Eyebrow label="Контакти" tone="dark" />
+              <Eyebrow label={dict.eyebrows.contact} tone="dark" />
             </Reveal>
             <div className="flex flex-col gap-5 sm:gap-6">
               <Reveal>
                 <h2 className="text-[clamp(2.5rem,7vw,4.5rem)] font-semibold leading-[1.02] tracking-[-0.03em] text-white">
-                  {brand.contact.heading}
+                  {dict.contact.heading}
                 </h2>
               </Reveal>
               <Reveal>
                 <p className="max-w-[440px] text-[16px] leading-[1.4] text-white/70 sm:text-[18px]">
-                  {brand.contact.sub}
+                  {dict.contact.sub}
                 </p>
               </Reveal>
             </div>
@@ -68,7 +68,7 @@ export function Contact() {
                 onClick={openContact}
                 className="group inline-flex h-[52px] items-center gap-2.5 rounded-full bg-white px-7 text-[16px] font-medium text-ink transition-colors duration-300 hover:bg-accent hover:text-white lg:h-[60px] lg:text-[18px]"
               >
-                {brand.contact.cta}
+                {dict.contact.cta}
                 <ArrowUpRight
                   weight="bold"
                   className="size-[18px] transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
@@ -80,7 +80,7 @@ export function Contact() {
 
         {/* pillars + direct contacts */}
         <div className="grid grid-cols-1 gap-x-4 gap-y-8 border-t border-white/10 pt-10 sm:grid-cols-2 lg:grid-cols-4">
-          {brand.contact.pillars.map((p, i) => (
+          {dict.contact.pillars.map((p, i) => (
             <Reveal key={p.title} delay={i * 0.06}>
               <h3 className="text-[16px] font-semibold tracking-[-0.4px] text-white">
                 {p.title}
@@ -92,26 +92,26 @@ export function Contact() {
           ))}
           <Reveal delay={0.12}>
             <p className="font-mono text-[10px] uppercase tracking-[2px] text-[#8c8c8c]">
-              Напряму
+              {dict.ui.directly}
             </p>
             <a
-              href={`mailto:${brand.contacts.email}`}
+              href={`mailto:${dict.contacts.email}`}
               className="mt-2 block text-[14px] text-white transition-colors hover:text-accent"
             >
-              {brand.contacts.email}
+              {dict.contacts.email}
             </a>
             <a
-              href={brand.contacts.behance.url}
+              href={dict.contacts.behance.url}
               target="_blank"
               rel="noopener noreferrer"
               className="mt-1 block text-[14px] text-white transition-colors hover:text-accent"
             >
-              Behance {brand.contacts.behance.handle}
+              Behance {dict.contacts.behance.handle}
             </a>
           </Reveal>
           <Reveal delay={0.18}>
             <p className="font-mono text-[10px] uppercase tracking-[2px] text-[#8c8c8c]">
-              Месенджер
+              {dict.ui.messenger}
             </p>
             <a
               href="https://t.me/pursuit"
@@ -119,9 +119,9 @@ export function Contact() {
               rel="noopener noreferrer"
               className="mt-2 block text-[14px] text-white transition-colors hover:text-accent"
             >
-              Telegram {brand.contacts.telegram}
+              Telegram {dict.contacts.telegram}
             </a>
-            <p className="mt-1 text-[14px] text-[#8c8c8c]">{brand.location}</p>
+            <p className="mt-1 text-[14px] text-[#8c8c8c]">{dict.location}</p>
           </Reveal>
         </div>
 
@@ -143,17 +143,32 @@ export function Contact() {
               {/* © + UA/EN share a row from tablet up; nav drops to its own
                   row on phone/tablet, then rejoins inline on desktop (contents) */}
               <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between lg:contents">
-                <span>© 2026 {brand.fullName}</span>
+                <span>© 2026 {dict.fullName}</span>
+                {/* language switch — the two versions are separate routes, so
+                    these are real links, not client-side state */}
                 <span className="flex items-center gap-2">
-                  <span className="text-white">UA</span>
-                  <span aria-hidden>/</span>
-                  <span className="opacity-40" title="Скоро">
-                    EN
-                  </span>
+                  {LANGS.map((l, i) => (
+                    <span key={l} className="flex items-center gap-2">
+                      {i > 0 && <span aria-hidden>/</span>}
+                      {l === dict.lang ? (
+                        <span aria-current="true" className="text-white">
+                          {langLabels[l]}
+                        </span>
+                      ) : (
+                        <Link
+                          href={localeHref[l]}
+                          hrefLang={l}
+                          className="opacity-40 transition-opacity hover:opacity-100"
+                        >
+                          {langLabels[l]}
+                        </Link>
+                      )}
+                    </span>
+                  ))}
                 </span>
               </div>
               <nav className="flex flex-wrap gap-x-5 gap-y-1">
-                {brand.nav.map((n) => (
+                {dict.nav.map((n) => (
                   <a
                     key={n.href}
                     href={n.href}
