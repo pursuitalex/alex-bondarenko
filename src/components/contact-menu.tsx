@@ -18,6 +18,9 @@ type FormState = {
 
 const EMPTY: FormState = { name: "", email: "", type: "", budget: "", message: "" };
 
+const GENERIC_ERROR =
+  "Не вдалося надіслати. Спробуйте ще раз або напишіть напряму на пошту нижче.";
+
 const chip = (active: boolean) =>
   `rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
     active
@@ -40,7 +43,10 @@ export function ContactMenu({
   const lenis = useLenis();
   const [form, setForm] = useState<FormState>(EMPTY);
   const [sent, setSent] = useState(false);
+  const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
+  // Honeypot — hidden from people, so anything here means a bot filled it in.
+  const [company, setCompany] = useState("");
 
   useEffect(() => {
     if (open) lenis?.stop();
@@ -61,21 +67,44 @@ export function ContactMenu({
     setError("");
   }
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
+    if (sending) return;
     if (!form.name.trim() || !form.email.trim() || !form.type) {
       setError("Заповніть ім'я, email і тип проєкту.");
       return;
     }
-    // TODO: wire to Resend / Formspree backend. For now confirm locally.
-    setSent(true);
+
+    setSending(true);
+    setError("");
+    try {
+      const res = await fetch("/api/brief", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ...form, company }),
+      });
+      // Only claim it was sent once the server says so — the whole point of
+      // wiring this up was that the old version confirmed unconditionally.
+      const data = await res.json().catch(() => null);
+      if (!res.ok || !data?.ok) {
+        setError(data?.error || GENERIC_ERROR);
+        return;
+      }
+      setSent(true);
+    } catch {
+      setError(GENERIC_ERROR);
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
     <AnimatePresence
       onExitComplete={() => {
         setSent(false);
+        setSending(false);
         setForm(EMPTY);
+        setCompany("");
         setError("");
       }}
     >
@@ -207,17 +236,37 @@ export function ContactMenu({
                     />
                   </label>
 
-                  {error && <p className="text-sm text-accent">{error}</p>}
+                  {/* honeypot — off-screen, skipped by tab and by screen readers */}
+                  <input
+                    type="text"
+                    name="company"
+                    value={company}
+                    onChange={(e) => setCompany(e.target.value)}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden
+                    className="pointer-events-none absolute left-[-9999px] size-0 opacity-0"
+                  />
+
+                  {error && (
+                    <p role="alert" className="text-sm text-accent">
+                      {error}
+                    </p>
+                  )}
 
                   <button
                     type="submit"
-                    className="group mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-paper px-6 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-accent hover:text-white active:scale-[0.98]"
+                    disabled={sending}
+                    aria-busy={sending}
+                    className="group mt-1 inline-flex items-center justify-center gap-2 rounded-full bg-paper px-6 py-3.5 text-sm font-medium text-ink transition-colors hover:bg-accent hover:text-white active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:bg-paper disabled:hover:text-ink"
                   >
-                    Надіслати заявку
-                    <ArrowUpRight
-                      weight="bold"
-                      className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                    />
+                    {sending ? "Надсилаю…" : "Надіслати заявку"}
+                    {!sending && (
+                      <ArrowUpRight
+                        weight="bold"
+                        className="size-4 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                      />
+                    )}
                   </button>
                 </form>
 
