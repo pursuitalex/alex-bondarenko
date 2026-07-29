@@ -1,5 +1,7 @@
 "use client";
 
+import { useRef } from "react";
+import { motion, useScroll, useTransform, useReducedMotion } from "framer-motion";
 import { ArrowUpRight } from "@phosphor-icons/react";
 import { Eyebrow } from "@/components/eyebrow";
 import { Magnetic } from "@/components/magnetic";
@@ -19,12 +21,28 @@ const [firstName, lastName] = brand.fullNameLatin.split(" ");
  * shared Reveal animation. id="contact" so hero/project CTAs land here.
  */
 export function Contact() {
+  const ref = useRef<HTMLElement>(null);
+  const reduce = useReducedMotion();
+
+  // Content settles into place as the panel comes up: 90% → its normal size.
+  // The scale sits on the inner wrapper, so the dark panel itself keeps its
+  // full size and layout height — a transform never moves the page around it.
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "start center"],
+  });
+  const scale = useTransform(scrollYProgress, [0, 1], [0.9, 1]);
+
   return (
     <section
+      ref={ref}
       id="contact"
       className="overflow-hidden rounded-frame bg-ink text-white"
     >
-      <div className="px-6 py-16 sm:px-10 sm:py-20 lg:px-14 lg:py-24">
+      <motion.div
+        style={reduce ? undefined : { scale }}
+        className="px-6 py-16 will-change-transform sm:px-10 sm:py-20 lg:px-14 lg:py-24"
+      >
         {/* top — eyebrow + heading + sub + CTA */}
         <div className="flex flex-col gap-10 pb-12 lg:flex-row lg:items-end lg:justify-between lg:pb-14">
           <div className="flex max-w-[672px] flex-col gap-7 sm:gap-8">
@@ -148,7 +166,7 @@ export function Contact() {
             </div>
           </Reveal>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 }
