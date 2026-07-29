@@ -20,11 +20,14 @@
 const ROWS = 4;
 const PER_ROW = 5;
 const TILT = -30; // degrees
-const DURATION = 46; // seconds per lap — same for every row, so speeds match
+const DURATION = 55; // seconds per lap — same for every row, so speeds match
 
 export function WorkCollage() {
   return (
-    <div className="relative aspect-[586/553] w-full overflow-hidden rounded-[20px] bg-ink">
+    /* Desktop widens the window without growing it: the media column went from
+       ~39% to half the row, so the ratio widens by the same factor to hold the
+       old height — otherwise the shorter timeline leaves a gap beside it. */
+    <div className="relative aspect-[586/553] w-full overflow-hidden rounded-[20px] bg-ink lg:aspect-[7/5]">
       <div
         aria-hidden
         className="absolute left-1/2 top-1/2 flex h-[170%] w-[170%] -translate-x-1/2 -translate-y-1/2 flex-col gap-4 lg:gap-[28px]"

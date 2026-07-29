@@ -27,7 +27,9 @@ export function Process() {
         </div>
 
         {/* timeline + media */}
-        <div className="mt-12 grid grid-cols-1 gap-10 sm:mt-14 lg:grid-cols-[1.55fr_1fr] lg:items-start lg:gap-4">
+        {/* even split on desktop, so the collage window opens at the page's
+            centre line — the timeline keeps the left half */}
+        <div className="mt-12 grid grid-cols-1 gap-10 sm:mt-14 lg:grid-cols-[1fr_1fr] lg:items-start lg:gap-4">
           {/* left: numbered steps */}
           <div className="border-t border-ink/10">
             {brand.process.map((step, i) => (
