@@ -68,6 +68,16 @@ for (const [srcRel, destRel] of DIRS) {
   }
 }
 
+if (rows.length === 0) {
+  // assets/ is deliberately not in git, so a fresh clone simply has no
+  // originals — /public already holds everything the site needs.
+  console.log(
+    "\n  No originals found under assets/ — nothing to do.\n" +
+      "  That folder is local-only (see .gitignore); /public is already built.\n",
+  );
+  process.exit(0);
+}
+
 console.log(rows.join("\n"));
 console.log(
   `\n  ${rows.length} images: ${kb(before)} → ${kb(after)}  (−${Math.round((1 - after / before) * 100)}%, saved ${kb(before - after)})`,

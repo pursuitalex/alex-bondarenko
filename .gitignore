@@ -44,12 +44,8 @@ next-env.d.ts
 # (leading "!" escaped: in gitignore an unescaped "!" means negation)
 /\!!!-do-not-deploy/
 
-# Image/video ORIGINALS — kept locally only, never pushed. `npm run images`
-# re-encodes them into /public (WebP), and /public is what the site serves.
-# The .ts files under assets/ are NOT ignored: src/ imports them, so dropping
-# them from git would break the production build.
-/assets/**/*.png
-/assets/**/*.jpg
-/assets/**/*.jpeg
-/assets/**/*.psd
-/assets/video/
+# Source originals (PNG/PSD/video/SVG) — local-only working files, never
+# pushed. `npm run images` re-encodes them into /public, and /public is what
+# the site actually serves. Editable copy lives in src/content/, NOT here, so
+# that this whole folder can stay out of git without breaking the build.
+/assets/

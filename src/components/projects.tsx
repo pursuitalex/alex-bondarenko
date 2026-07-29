@@ -2,11 +2,11 @@ import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
 import { brand } from "@/lib/brand";
 import { contentWide } from "@/lib/layout";
-import { projects } from "../../assets/projects/projects";
+import { projects } from "@/content/projects";
 
 /**
- * Selected projects (Figma 14:1825). Labels come from assets/projects/projects.ts
- * (easy-edit file); photo/logo are matched by position — entry i → /projects/{i+1}.png
+ * Selected projects (Figma 14:1825). Labels come from src/content/projects.ts
+ * (easy-edit file); photo/logo are matched by position — entry i → /projects/{i+1}.webp
  * and /projects/logos/{i+1}.svg. Card: white label bar (name /year + type) +
  * image (photo + dark gradient + 250px logo) with hover zoom/lift. Wide width.
  */

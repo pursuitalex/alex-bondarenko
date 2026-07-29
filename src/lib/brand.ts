@@ -108,7 +108,7 @@ export const brand = {
     },
   ],
 
-  // Project labels live in assets/projects/projects.ts (easy-edit file: name/year/type).
+  // Project labels live in src/content/projects.ts (easy-edit file: name/year/type).
 
   services: [
     {
@@ -152,7 +152,7 @@ export const brand = {
     },
   ],
 
-  // FAQ copy (heading, subtitle, Q&A) lives in assets/faq.ts (easy-edit file).
+  // FAQ copy (heading, subtitle, Q&A) lives in src/content/faq.ts (easy-edit file).
 
   contact: {
     heading: "Готові підняти продажі?",

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Eyebrow } from "@/components/eyebrow";
 import { Reveal } from "@/components/reveal";
 import { contentWide } from "@/lib/layout";
-import { faq, faqHeading, faqSub } from "../../assets/faq";
+import { faq, faqHeading, faqSub } from "@/content/faq";
 
 /**
  * "Часті запитання та Відповіді" (Figma 49:19079). Two columns at wide width:
@@ -12,7 +12,7 @@ import { faq, faqHeading, faqSub } from "../../assets/faq";
  * (question + animated +/− toggle, smooth height reveal). Single-open accordion;
  * answers stay in the DOM (height-collapsed) for SEO/a11y.
  *
- * Copy (heading, subtitle, Q&A) is edited in assets/faq.ts.
+ * Copy (heading, subtitle, Q&A) is edited in src/content/faq.ts.
  */
 export function Faq() {
   const [open, setOpen] = useState<number | null>(null);
