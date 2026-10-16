@@ -73,7 +73,7 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
       <div data-scrub-track className="relative z-20 lg:h-[250dvh]">
         <div
           data-pin
-          className="lg:sticky lg:top-0 lg:h-[calc(100dvh-var(--header-h)-0.75rem)]"
+          className="lg:sticky lg:top-[calc(var(--header-h)+0.75rem)] lg:h-[calc(100dvh-var(--header-h)-1.5rem)]"
         >
           {/* heroY recede lives INSIDE the sticky → 0 while pinned, recedes after */}
           <motion.div

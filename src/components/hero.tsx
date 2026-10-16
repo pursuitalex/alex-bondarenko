@@ -49,14 +49,15 @@ export function Hero({ dict }: { dict: Dict }) {
   const initial = reduce ? "show" : "hidden";
 
   return (
-    /* The pin sizes this section to the viewport MINUS the sticky header, so
-       the opener ends exactly at the fold. That leaves less room than a full
-       100dvh did, so the short-window guard below trims both paddings earlier
-       than it used to: at the narrowest desktop the content needs ~611px, and
-       with the trimmed padding it still fits down to a ~795px-tall window. */
+    /* The pin sizes this section to the viewport MINUS the sticky header and
+       the same gap it keeps at its sides, so the opener never touches the
+       bottom edge. That leaves less room than a full 100dvh did, so the
+       short-window guard below trims both paddings earlier than it used to: at
+       the narrowest desktop the content needs ~611px, and with the trimmed
+       padding it still fits down to a ~791px-tall window. */
     <section
       id="top"
-      className="relative flex min-h-[88dvh] flex-col justify-between overflow-hidden rounded-frame bg-ink px-5 pb-14 pt-8 text-white sm:px-8 lg:px-[52px] lg:pb-[88px] lg:pt-12 lg:[@media(max-height:830px)]:pb-[60px] lg:[@media(max-height:830px)]:pt-8"
+      className="relative flex min-h-[88dvh] flex-col justify-between overflow-hidden rounded-frame bg-ink px-5 pb-14 pt-8 text-white sm:px-8 lg:px-[52px] lg:pb-[88px] lg:pt-12 lg:min-h-0 lg:[@media(max-height:840px)]:pb-[60px] lg:[@media(max-height:840px)]:pt-8"
     >
       {/* background — scrubbed video on desktop, static photo + fade on
           phone/tablet. The cursor water-drops reveal is still kept in

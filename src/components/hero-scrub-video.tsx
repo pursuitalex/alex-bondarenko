@@ -55,12 +55,18 @@ export function HeroScrubVideo({ src }: { src: string }) {
       const duration = s.duration || video.duration || 0;
       if (!duration || !track) return;
       const trackTop = track.getBoundingClientRect().top + window.scrollY;
-      const scrubDist =
-        track.offsetHeight - (pin?.offsetHeight || window.innerHeight);
+      const pinH = pin?.offsetHeight || window.innerHeight;
+      const scrubDist = track.offsetHeight - pinH;
       if (scrubDist <= 0) return;
+      // The pin is stuck BELOW the sticky header, not at the viewport top, so
+      // it latches while the page is still at scroll 0. Measuring from the
+      // track's own top would waste that offset: the video would sit on frame
+      // one until the reader had scrolled the header's height.
+      const stickyTop = pin ? parseFloat(getComputedStyle(pin).top) || 0 : 0;
+      const start = trackTop - stickyTop;
       const progress = Math.min(
         1,
-        Math.max(0, (window.scrollY - trackTop) / scrubDist),
+        Math.max(0, (window.scrollY - start) / scrubDist),
       );
       s.target = progress * duration;
     };
