@@ -16,11 +16,10 @@ export const contentWide =
 export const contentCol = "mx-auto w-full max-w-5xl px-2 sm:px-6";
 
 /**
- * pageMax — outer cap for the whole page, hero included.
+ * pageMax — outer cap for everything below the hero.
  *
  * Past ~1920 the proportional padding kept stretching the content instead of
- * settling, so on a 2560 monitor the measure got uncomfortably wide. The
- * diagonal marquee stripes are deliberately left out of it: they bleed past
- * the content by design.
+ * settling, so on a 2560 monitor the measure got uncomfortably wide. The hero
+ * is deliberately NOT capped: it stays edge-to-edge as the full-bleed opener.
  */
 export const pageMax = "mx-auto w-full max-w-[1920px]";
