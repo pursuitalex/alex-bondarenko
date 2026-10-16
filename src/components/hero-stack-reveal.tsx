@@ -59,7 +59,9 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
   if (reduce) {
     return (
       <>
-        <Hero dict={dict} />
+        <div className={pageMax}>
+          <Hero dict={dict} />
+        </div>
         <div className={`${pageMax} mt-3`}>
           <TechStack dict={dict} />
         </div>
@@ -70,7 +72,10 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
   return (
     <>
       {/* PHASE 1 — pinned hero + video scrub (desktop only, via `lg:`) */}
-      <div data-scrub-track className="relative z-20 lg:h-[250dvh]">
+      <div
+        data-scrub-track
+        className={`${pageMax} relative z-20 lg:h-[250dvh]`}
+      >
         <div
           data-pin
           className="lg:sticky lg:top-[calc(var(--header-h)+0.75rem)] lg:h-[calc(100dvh-var(--header-h)-1.5rem)]"
