@@ -49,13 +49,14 @@ export function Hero({ dict }: { dict: Dict }) {
   const initial = reduce ? "show" : "hidden";
 
   return (
-    /* pb: more breathing room under the last row, but only where the panel can
-       spare it. On desktop the pin locks this section to exactly 100dvh while
-       the content needs ~718px, so on a short window the extra padding would
-       push the card under the clip instead of adding air. */
+    /* The pin sizes this section to the viewport MINUS the sticky header, so
+       the opener ends exactly at the fold. That leaves less room than a full
+       100dvh did, so the short-window guard below trims both paddings earlier
+       than it used to: at the narrowest desktop the content needs ~611px, and
+       with the trimmed padding it still fits down to a ~795px-tall window. */
     <section
       id="top"
-      className="relative flex min-h-[88dvh] flex-col justify-between overflow-hidden rounded-frame bg-ink px-5 pb-14 pt-8 text-white sm:px-8 lg:px-[52px] lg:pb-[88px] lg:pt-12 lg:[@media(max-height:760px)]:pb-[60px]"
+      className="relative flex min-h-[88dvh] flex-col justify-between overflow-hidden rounded-frame bg-ink px-5 pb-14 pt-8 text-white sm:px-8 lg:px-[52px] lg:pb-[88px] lg:pt-12 lg:[@media(max-height:830px)]:pb-[60px] lg:[@media(max-height:830px)]:pt-8"
     >
       {/* background — scrubbed video on desktop, static photo + fade on
           phone/tablet. The cursor water-drops reveal is still kept in

@@ -46,6 +46,9 @@ next-env.d.ts
 # (leading "!" escaped: in gitignore an unescaped "!" means negation)
 /\!!!-do-not-deploy/
 
+# local job-search log — personal notes, never pushed
+/job-search/
+
 # Source originals (PNG/PSD/video/SVG) — local-only working files, never
 # pushed. `npm run images` re-encodes them into /public, and /public is what
 # the site actually serves. Editable copy lives in src/content/, NOT here, so

@@ -31,6 +31,11 @@
    ============================================================ */
 :root {
   color-scheme: light;
+
+  /* Sticky header height. The header sets its own box from this, and the hero
+     subtracts it (plus main's top padding) so the opener ends exactly at the
+     fold instead of hanging below it. Change it here only. */
+  --header-h: 4rem;
 }
 
 * {
@@ -108,6 +113,12 @@ html.lenis body {
   height: 7rem;
   z-index: 30;
   pointer-events: none;
+  /* off over the hero; the component flips data-past once it scrolls away */
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.progressive-blur[data-past="true"] {
+  opacity: 1;
 }
 
 /* ============================================================

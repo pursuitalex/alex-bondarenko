@@ -67,7 +67,7 @@ export function Header({
   return (
     <header className="sticky top-0 z-40 bg-paper/80 backdrop-blur-md">
       {/* every element is an equidistant sibling — no centred group */}
-      <div className="flex items-center justify-between gap-4 px-4 py-4 sm:px-6 md:px-8">
+      <div className="flex h-[var(--header-h)] items-center justify-between gap-4 px-4 sm:px-6 md:px-8">
         <a
           href="#top"
           className="text-[16px] font-semibold tracking-tight sm:text-[18px]"

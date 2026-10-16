@@ -11,6 +11,7 @@ import { Hero } from "@/components/hero";
 import type { Dict } from "@/lib/dict";
 import { TechStack } from "@/components/tech-stack";
 import { useMediaQuery, LG } from "@/lib/use-media-query";
+import { pageMax } from "@/lib/layout";
 
 /**
  * Hero → TechStack. Desktop gets a two-phase scroll sequence; phone and tablet
@@ -59,7 +60,7 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
     return (
       <>
         <Hero dict={dict} />
-        <div className="mt-3">
+        <div className={`${pageMax} mt-3`}>
           <TechStack dict={dict} />
         </div>
       </>
@@ -70,7 +71,10 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
     <>
       {/* PHASE 1 — pinned hero + video scrub (desktop only, via `lg:`) */}
       <div data-scrub-track className="relative z-20 lg:h-[250dvh]">
-        <div data-pin className="lg:sticky lg:top-0 lg:h-[100dvh]">
+        <div
+          data-pin
+          className="lg:sticky lg:top-0 lg:h-[calc(100dvh-var(--header-h)-0.75rem)]"
+        >
           {/* heroY recede lives INSIDE the sticky → 0 while pinned, recedes after */}
           <motion.div
             style={animate ? { y: heroY } : undefined}
@@ -83,7 +87,10 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
 
       {/* PHASE 2 — logos revealed from under the receding hero. Below lg they
           simply follow the hero with the usual gap, untucked and unscaled. */}
-      <div ref={stackRef} className="relative z-10 mt-3 lg:-mt-[35vh]">
+      <div
+        ref={stackRef}
+        className={`${pageMax} relative z-10 mt-3 lg:-mt-[35vh]`}
+      >
         <motion.div
           style={animate ? { scale: stackScale } : undefined}
           className="origin-top will-change-transform"
