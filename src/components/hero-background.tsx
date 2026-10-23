@@ -1,59 +1,56 @@
 "use client";
 
 import { HeroScrubVideo } from "@/components/hero-scrub-video";
-import { useMediaQuery, MD, LG } from "@/lib/use-media-query";
+import { useMediaQuery, LG } from "@/lib/use-media-query";
 
 /**
- * Hero backdrop, one per tier (Figma 126:34 for the phone frame).
+ * Hero backdrop, one still per tier (Figma 126:34 for the phone frame).
  *
- *  DESKTOP (lg+) — the scroll-scrubbed video, unchanged.
- *  TABLET / PHONE — a still frame each, shot for its own aspect: the phone
- *  source is near-square, the tablet one much wider. The photo is anchored to
- *  the top and a gradient fades it into #2d0705 so its bottom edge never
- *  shows; below the fade the panel is just flat colour.
+ * The still is chosen by the BROWSER from media queries, not by JS, so the
+ * server's markup is already correct at every width. Deciding it in JS meant
+ * the first paint always used the phone crop — on a desktop panel that is a
+ * near-square portrait stretched edge to edge, i.e. a giant slice of the face
+ * — which then jumped to the video the moment hydration ran.
  *
- * The video is gated on a real media query rather than `hidden lg:block`,
- * because a mounted <video preload="auto"> still downloads its ~2.2 MB even
- * while hidden — the whole point of the still frame is to avoid that on a
- * phone connection.
+ * On desktop the still is the video's own first frame, so when the video
+ * mounts on top it lands on identical pixels and the swap cannot be seen.
+ *
+ * Each tier downloads only its own file: a <source> whose media query does not
+ * match is never fetched.
  */
 
-/** Photo runs to 72%, safely past the 66% where the fade turns solid. */
-const PHOTO_H = "h-[72%]";
+/** Below lg the still runs to 72%, safely past the 66% where the fade turns solid. */
+const STILL_BOX = "absolute inset-x-0 top-0 h-[72%] lg:h-full";
 
 export function HeroBackground() {
   const isDesktop = useMediaQuery(LG);
-  const isTablet = useMediaQuery(MD);
-
-  if (isDesktop) {
-    return (
-      <>
-        <HeroScrubVideo src="/hero.mp4" />
-        <div aria-hidden className="absolute inset-0 bg-black/10" />
-      </>
-    );
-  }
 
   return (
     <>
-      <div aria-hidden className={`absolute inset-x-0 top-0 ${PHOTO_H}`}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={isTablet ? "/hero-tablet.webp" : "/hero-phone.webp"}
-          alt=""
-          // Phone: the subject sits right of centre in a narrow panel, so a
-          // centred crop clips his face — hence 70%. The tablet frame is
-          // already composed for its width and needs no nudge.
-          className={`h-full w-full object-cover ${
-            isTablet ? "object-center" : "object-[70%_50%]"
-          }`}
-        />
+      <div aria-hidden className={STILL_BOX}>
+        <picture className="block h-full w-full">
+          <source media="(min-width: 1024px)" srcSet="/hero-desktop.webp" />
+          <source media="(min-width: 768px)" srcSet="/hero-tablet.webp" />
+          <img
+            src="/hero-phone.webp"
+            alt=""
+            className="hero-still h-full w-full object-cover"
+          />
+        </picture>
       </div>
-      {/* transparent until 53%, solid by 66% — hides the photo's bottom edge */}
+
+      {/* transparent until 53%, solid by 66% — hides the still's bottom edge.
+          Desktop has no fade: the video fills the panel. */}
       <div
         aria-hidden
-        className="absolute inset-0 bg-gradient-to-b from-[rgba(75,9,6,0)] from-[53%] to-[#2d0705] to-[66%]"
+        className="absolute inset-0 bg-gradient-to-b from-[rgba(75,9,6,0)] from-[53%] to-[#2d0705] to-[66%] lg:hidden"
       />
+
+      {/* Still gated in JS rather than hidden with CSS: a mounted
+          <video preload="auto"> downloads its ~2.2 MB even while hidden, and a
+          phone must not pay for a video it will never see. */}
+      {isDesktop && <HeroScrubVideo src="/hero.mp4" />}
+
       <div aria-hidden className="absolute inset-0 bg-black/10" />
     </>
   );

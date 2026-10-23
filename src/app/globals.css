@@ -102,6 +102,24 @@ html.lenis body {
 }
 
 /* ============================================================
+   HERO STILL — crop differs per tier
+   ============================================================ */
+/* The phone frame is composed for a narrow panel, where a centred crop clips
+   the subject's face — so it sits at 70%. The tablet and desktop frames are
+   composed for their own widths and sit centred.
+
+   Plain CSS rather than a `md:` utility: Tailwind ordered the arbitrary
+   object-position ahead of the responsive one, so the override never won. */
+.hero-still {
+  object-position: 70% 50%;
+}
+@media (min-width: 768px) {
+  .hero-still {
+    object-position: 50% 50%;
+  }
+}
+
+/* ============================================================
    PROGRESSIVE BLUR — content softens toward the bottom edge
    (layers stacked in the React component)
    ============================================================ */
