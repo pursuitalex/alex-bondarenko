@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useScroll,
@@ -12,6 +12,12 @@ import type { Dict } from "@/lib/dict";
 import { TechStack } from "@/components/tech-stack";
 import { useMediaQuery, LG } from "@/lib/use-media-query";
 import { pageMax } from "@/lib/layout";
+import { useLenis } from "lenis/react";
+import {
+  OPENER_SWEEP_MS,
+  OPENER_ZOOM_MS,
+  msUntil,
+} from "@/lib/hero-opener";
 
 /**
  * Hero → TechStack. Desktop gets a two-phase scroll sequence; phone and tablet
@@ -41,6 +47,45 @@ import { pageMax } from "@/lib/layout";
  */
 export function HeroStackReveal({ dict }: { dict: Dict }) {
   const stackRef = useRef<HTMLDivElement>(null);
+  const openerRef = useRef<HTMLDivElement>(null);
+  const lenis = useLenis();
+
+  // Decided once, synchronously, from the same conditions the CSS uses — not
+  // from the media-query hook below, whose server snapshot would read "mobile"
+  // on the first client render and flip the opener off for a frame.
+  const [openerRuns] = useState(
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(min-width: 1024px)").matches &&
+      window.matchMedia("(prefers-reduced-motion: no-preference)").matches &&
+      window.scrollY === 0,
+  );
+  const [opened, setOpened] = useState(false);
+  const contentReady = !openerRuns || opened;
+
+  // The CSS animation runs on every desktop load; if this one does not
+  // qualify (restored scroll), cancel it now that we can tell.
+  useEffect(() => {
+    if (!openerRuns && openerRef.current) {
+      openerRef.current.style.animation = "none";
+    }
+  }, [openerRuns]);
+
+  // Hold the page still until the panel has opened, then let it go.
+  useEffect(() => {
+    if (!openerRuns) return;
+    lenis?.stop();
+    const toCopy = setTimeout(() => setOpened(true), msUntil(OPENER_SWEEP_MS));
+    const toEnd = setTimeout(
+      () => lenis?.start(),
+      msUntil(OPENER_SWEEP_MS + OPENER_ZOOM_MS),
+    );
+    return () => {
+      clearTimeout(toCopy);
+      clearTimeout(toEnd);
+      lenis?.start();
+    };
+  }, [openerRuns, lenis]);
   const reduce = useReducedMotion();
   const isDesktop = useMediaQuery(LG);
   const animate = isDesktop && !reduce;
@@ -78,9 +123,21 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
           {/* heroY recede lives INSIDE the sticky → 0 while pinned, recedes after */}
           <motion.div
             style={animate ? { y: heroY } : undefined}
-            className="origin-top will-change-transform lg:h-full lg:[&>section]:h-full"
+            className="origin-top will-change-transform lg:h-full"
           >
-            <Hero dict={dict} />
+            {/* The opener zoom lives on its own element so it cannot fight the
+                recede transform above it. Its animation is CSS (globals.css):
+                it has to be painted from the server markup, before hydration. */}
+            <div
+              ref={openerRef}
+              className="hero-opener h-full lg:[&>section]:h-full"
+            >
+              <Hero
+                dict={dict}
+                opener={openerRuns}
+                contentReady={contentReady}
+              />
+            </div>
           </motion.div>
         </div>
       </div>

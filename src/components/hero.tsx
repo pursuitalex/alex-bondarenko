@@ -44,9 +44,20 @@ function RolesList({ dict, className }: { dict: Dict; className?: string }) {
   );
 }
 
-export function Hero({ dict }: { dict: Dict }) {
+export function Hero({
+  dict,
+  opener = false,
+  contentReady = true,
+}: {
+  dict: Dict;
+  /** Run the reverse-video opener behind the panel (see HeroStackReveal). */
+  opener?: boolean;
+  /** Hold the copy back until the opener has zoomed the panel open. */
+  contentReady?: boolean;
+}) {
   const reduce = useReducedMotion();
   const initial = reduce ? "show" : "hidden";
+  const show = contentReady ? "show" : "hidden";
 
   return (
     /* The pin sizes this section to the viewport MINUS the sticky header and
@@ -62,13 +73,13 @@ export function Hero({ dict }: { dict: Dict }) {
       {/* background — scrubbed video on desktop, static photo + fade on
           phone/tablet. The cursor water-drops reveal is still kept in
           hero-reveal.tsx if we ever revert. */}
-      <HeroBackground />
+      <HeroBackground opener={opener} />
 
       {/* eyebrow — Geist Mono 10px (mobile) → 12px / 1.2px / uppercase / 90% */}
       <motion.div
         variants={container}
         initial={initial}
-        animate="show"
+        animate={show}
         className="relative z-10 flex items-start justify-between gap-4 font-mono text-[10px] uppercase leading-[14px] tracking-[1.2px] text-white/90 sm:text-[11px] sm:leading-[15px] lg:text-[12px] lg:leading-[16.5px]"
       >
         <motion.span variants={fadeUp}>
@@ -83,7 +94,7 @@ export function Hero({ dict }: { dict: Dict }) {
       <motion.div
         variants={container}
         initial={initial}
-        animate="show"
+        animate={show}
         className="relative z-10 flex flex-col gap-10 py-6 xl:flex-row xl:items-end xl:justify-between xl:gap-6"
       >
         <h1
@@ -118,7 +129,7 @@ export function Hero({ dict }: { dict: Dict }) {
       <motion.div
         variants={container}
         initial={initial}
-        animate="show"
+        animate={show}
         className="relative z-10 flex flex-col gap-8 border-t border-white/30 pt-8 lg:flex-row lg:items-end lg:justify-between lg:gap-10 lg:pt-[49px]"
       >
         <motion.div variants={fadeUp} className="max-w-[432px]">

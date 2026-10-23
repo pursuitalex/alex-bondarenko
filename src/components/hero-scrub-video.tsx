@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { OPENER_SWEEP_MS } from "@/lib/hero-opener";
 
 /**
  * Scroll-scrubbed background video for a PINNED hero (see HeroStackReveal).
@@ -12,12 +13,36 @@ import { useEffect, useRef } from "react";
  * scrolls don't snap the video — it glides after them with a slight delay.
  * Seeks are chained via the `seeked` event (one seek at a time; re-seek if it
  * drifts) so no seek is dropped. All state lives in a ref → no re-renders.
+ *
+ * OPENER: with `opener`, the video first runs BACKWARDS from its last frame to
+ * its first, under the zoom in globals.css, and only then hands over to scroll.
+ * Reverse is done by walking `currentTime` down, because no browser plays a
+ * video backwards reliably — `playbackRate = -1` is not supported. This file
+ * was already encoded with a keyframe every 8 frames, which is what makes
+ * seeking that dense survivable.
  */
 const EASE = 0.1; // how fast `rendered` catches `target` per frame (lower = more lag/smoother)
 
-export function HeroScrubVideo({ src }: { src: string }) {
+/** Never sweep shorter than this, however late hydration was. */
+const MIN_SWEEP_MS = 200;
+
+export function HeroScrubVideo({
+  src,
+  opener = false,
+}: {
+  src: string;
+  opener?: boolean;
+}) {
   const videoRef = useRef<HTMLVideoElement>(null);
-  const st = useRef({ target: 0, rendered: 0, isSeeking: false, duration: 0, raf: 0 });
+  const st = useRef({
+    target: 0,
+    rendered: 0,
+    isSeeking: false,
+    duration: 0,
+    raf: 0,
+    sweeping: false,
+    started: false,
+  });
 
   useEffect(() => {
     const video = videoRef.current;
@@ -25,11 +50,6 @@ export function HeroScrubVideo({ src }: { src: string }) {
     const s = st.current;
     const track = video.closest("[data-scrub-track]") as HTMLElement | null;
     const pin = track?.querySelector("[data-pin]") as HTMLElement | null;
-
-    const init = () => {
-      s.duration = video.duration || 0;
-      video.pause();
-    };
 
     const seek = (t: number) => {
       if (s.isSeeking) return;
@@ -86,7 +106,52 @@ export function HeroScrubVideo({ src }: { src: string }) {
       if (!s.raf) s.raf = requestAnimationFrame(tick);
     };
 
+    const handOverToScroll = () => {
+      s.sweeping = false;
+      s.raf = 0;
+      computeTarget();
+      s.rendered = s.target;
+      seek(s.rendered);
+    };
+
+    /** Last frame → first, finishing as the CSS zoom begins. */
+    const sweepBackwards = () => {
+      const d = s.duration;
+      if (!d) return handOverToScroll();
+      s.sweeping = true;
+      // Budget is whatever is LEFT of the opener's first beat, so however long
+      // hydration and metadata took, the sweep still lands on the zoom.
+      const budget = Math.max(MIN_SWEEP_MS, OPENER_SWEEP_MS - performance.now());
+      const from = performance.now();
+      s.rendered = d;
+      s.target = d;
+      seek(d);
+      const step = () => {
+        const p = Math.min(1, (performance.now() - from) / budget);
+        const t = d * (1 - p);
+        s.rendered = t;
+        s.target = t;
+        seek(t);
+        if (p < 1) {
+          s.raf = requestAnimationFrame(step);
+          return;
+        }
+        handOverToScroll();
+      };
+      s.raf = requestAnimationFrame(step);
+    };
+
+    const init = () => {
+      if (s.started) return;
+      s.started = true;
+      s.duration = video.duration || 0;
+      video.pause();
+      if (opener) sweepBackwards();
+      else handOverToScroll();
+    };
+
     const onScroll = () => {
+      if (s.sweeping) return; // the opener owns the playhead until it is done
       computeTarget();
       runLoop();
     };
@@ -95,9 +160,6 @@ export function HeroScrubVideo({ src }: { src: string }) {
     video.addEventListener("seeked", onSeeked);
     window.addEventListener("scroll", onScroll, { passive: true });
     if (video.readyState >= 1) init();
-    computeTarget();
-    s.rendered = s.target; // start in sync (no ease-in on load)
-    seek(s.rendered);
 
     return () => {
       cancelAnimationFrame(s.raf);
@@ -105,7 +167,7 @@ export function HeroScrubVideo({ src }: { src: string }) {
       video.removeEventListener("seeked", onSeeked);
       window.removeEventListener("scroll", onScroll);
     };
-  }, []);
+  }, [opener]);
 
   return (
     <video
