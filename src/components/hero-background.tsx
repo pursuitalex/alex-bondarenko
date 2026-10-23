@@ -22,7 +22,13 @@ import { useMediaQuery, LG } from "@/lib/use-media-query";
 /** Below lg the still runs to 72%, safely past the 66% where the fade turns solid. */
 const STILL_BOX = "absolute inset-x-0 top-0 h-[72%] lg:h-full";
 
-export function HeroBackground({ opener = false }: { opener?: boolean }) {
+export function HeroBackground({
+  opener = false,
+  onOpenerDone,
+}: {
+  opener?: boolean;
+  onOpenerDone?: () => void;
+}) {
   const isDesktop = useMediaQuery(LG);
 
   return (
@@ -49,7 +55,13 @@ export function HeroBackground({ opener = false }: { opener?: boolean }) {
       {/* Still gated in JS rather than hidden with CSS: a mounted
           <video preload="auto"> downloads its ~2.2 MB even while hidden, and a
           phone must not pay for a video it will never see. */}
-      {isDesktop && <HeroScrubVideo src="/hero.mp4" opener={opener} />}
+      {isDesktop && (
+        <HeroScrubVideo
+          src="/hero.mp4"
+          opener={opener}
+          onOpenerDone={onOpenerDone}
+        />
+      )}
 
       <div aria-hidden className="absolute inset-0 bg-black/10" />
     </>

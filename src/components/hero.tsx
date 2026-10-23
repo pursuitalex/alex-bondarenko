@@ -48,12 +48,15 @@ export function Hero({
   dict,
   opener = false,
   contentReady = true,
+  onOpenerDone,
 }: {
   dict: Dict;
   /** Run the reverse-video opener behind the panel (see HeroStackReveal). */
   opener?: boolean;
   /** Hold the copy back until the opener has zoomed the panel open. */
   contentReady?: boolean;
+  /** Fired when the backwards sweep ends, so the panel can zoom. */
+  onOpenerDone?: () => void;
 }) {
   const reduce = useReducedMotion();
   const initial = reduce ? "show" : "hidden";
@@ -73,7 +76,7 @@ export function Hero({
       {/* background — scrubbed video on desktop, static photo + fade on
           phone/tablet. The cursor water-drops reveal is still kept in
           hero-reveal.tsx if we ever revert. */}
-      <HeroBackground opener={opener} />
+      <HeroBackground opener={opener} onOpenerDone={onOpenerDone} />
 
       {/* eyebrow — Geist Mono 10px (mobile) → 12px / 1.2px / uppercase / 90% */}
       <motion.div

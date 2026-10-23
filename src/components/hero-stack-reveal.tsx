@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   motion,
   useScroll,
@@ -13,11 +13,7 @@ import { TechStack } from "@/components/tech-stack";
 import { useMediaQuery, LG } from "@/lib/use-media-query";
 import { pageMax } from "@/lib/layout";
 import { useLenis } from "lenis/react";
-import {
-  OPENER_SWEEP_MS,
-  OPENER_ZOOM_MS,
-  msUntil,
-} from "@/lib/hero-opener";
+import { OPENER_MAX_WAIT_MS, OPENER_ZOOM_MS } from "@/lib/hero-opener";
 
 /**
  * Hero → TechStack. Desktop gets a two-phase scroll sequence; phone and tablet
@@ -63,29 +59,36 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
   const [opened, setOpened] = useState(false);
   const contentReady = !openerRuns || opened;
 
-  // The CSS animation runs on every desktop load; if this one does not
-  // qualify (restored scroll), cancel it now that we can tell.
-  useEffect(() => {
-    if (!openerRuns && openerRef.current) {
-      openerRef.current.style.animation = "none";
-    }
-  }, [openerRuns]);
+  // Cued by the video, not by a timer: the zoom has to wait for the sweep to
+  // reach frame 0, otherwise it fires while the reverse playback is still
+  // getting going and the playback is never seen.
+  const openPanel = useCallback(() => setOpened(true), []);
 
-  // Hold the page still until the panel has opened, then let it go.
   useEffect(() => {
-    if (!openerRuns) return;
+    // Loads that get no opener (mobile, reduced motion, a restored scroll
+    // position) must not sit at the small state the server painted. Written
+    // straight to the DOM rather than through state, so the server and the
+    // first client render agree on "closed" and React has nothing to patch.
+    if (!openerRuns) {
+      openerRef.current?.setAttribute("data-open", "true");
+      return;
+    }
     lenis?.stop();
-    const toCopy = setTimeout(() => setOpened(true), msUntil(OPENER_SWEEP_MS));
-    const toEnd = setTimeout(
-      () => lenis?.start(),
-      msUntil(OPENER_SWEEP_MS + OPENER_ZOOM_MS),
-    );
+    // If the video never becomes seekable, open anyway rather than leaving
+    // the panel stranded at 30%.
+    const safety = setTimeout(openPanel, OPENER_MAX_WAIT_MS);
     return () => {
-      clearTimeout(toCopy);
-      clearTimeout(toEnd);
+      clearTimeout(safety);
       lenis?.start();
     };
-  }, [openerRuns, lenis]);
+  }, [openerRuns, lenis, openPanel]);
+
+  // Let the page go once the zoom has finished.
+  useEffect(() => {
+    if (!opened || !openerRuns) return;
+    const release = setTimeout(() => lenis?.start(), OPENER_ZOOM_MS);
+    return () => clearTimeout(release);
+  }, [opened, openerRuns, lenis]);
   const reduce = useReducedMotion();
   const isDesktop = useMediaQuery(LG);
   const animate = isDesktop && !reduce;
@@ -130,12 +133,14 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
                 it has to be painted from the server markup, before hydration. */}
             <div
               ref={openerRef}
+              data-open={opened ? "true" : "false"}
               className="hero-opener h-full lg:[&>section]:h-full"
             >
               <Hero
                 dict={dict}
                 opener={openerRuns}
                 contentReady={contentReady}
+                onOpenerDone={openPanel}
               />
             </div>
           </motion.div>

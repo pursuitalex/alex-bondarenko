@@ -1,21 +1,22 @@
 /**
- * Timings for the hero opener, shared by the CSS animation and the JS that
+ * Timings for the hero opener, shared by the CSS in globals.css and the JS that
  * sweeps the video backwards through it.
  *
- * These MIRROR `.hero-opener` in globals.css — change both together. The CSS
- * owns the zoom because it must be painted from the server markup, before
- * hydration; JS only has to land the video on the same beat.
+ * The sweep owns the clock: the zoom waits for it to finish rather than running
+ * on its own schedule. An earlier version gave the sweep whatever was LEFT of a
+ * fixed deadline, so hydration and video loading ate it — on a real load it got
+ * ~200ms, far too little for seeking to render more than a couple of frames,
+ * and the reverse playback was never actually seen.
  */
 
-/** Panel stays small while the video runs backwards. = the CSS animation-delay. */
+/** How long the video takes to run from its last frame back to its first. */
 export const OPENER_SWEEP_MS = 1200;
 
-/** Zoom out to full size. = the CSS animation-duration. */
+/** Zoom to full size. MUST match the transition duration in globals.css. */
 export const OPENER_ZOOM_MS = 600;
 
 /**
- * The CSS clock starts when styles apply; JS only wakes at hydration. So every
- * JS step is scheduled against page load, not against mount — otherwise a slow
- * hydration would drift the video out of step with the zoom.
+ * If the video has not become seekable by now, open anyway. Without this a
+ * failed or very slow video would leave the panel stuck at 30% forever.
  */
-export const msUntil = (mark: number) => Math.max(0, mark - performance.now());
+export const OPENER_MAX_WAIT_MS = 2500;

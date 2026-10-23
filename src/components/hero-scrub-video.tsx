@@ -23,15 +23,15 @@ import { OPENER_SWEEP_MS } from "@/lib/hero-opener";
  */
 const EASE = 0.1; // how fast `rendered` catches `target` per frame (lower = more lag/smoother)
 
-/** Never sweep shorter than this, however late hydration was. */
-const MIN_SWEEP_MS = 200;
-
 export function HeroScrubVideo({
   src,
   opener = false,
+  onOpenerDone,
 }: {
   src: string;
   opener?: boolean;
+  /** Fired when the backwards sweep lands on frame 0, so the zoom can start. */
+  onOpenerDone?: () => void;
 }) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const st = useRef({
@@ -42,6 +42,7 @@ export function HeroScrubVideo({
     raf: 0,
     sweeping: false,
     started: false,
+    openerDone: false,
   });
 
   useEffect(() => {
@@ -114,14 +115,23 @@ export function HeroScrubVideo({
       seek(s.rendered);
     };
 
-    /** Last frame → first, finishing as the CSS zoom begins. */
+    /** Sweep over (or impossible): hand the playhead to scroll and cue the zoom. */
+    const finishOpener = () => {
+      if (s.openerDone) return;
+      s.openerDone = true;
+      handOverToScroll();
+      onOpenerDone?.();
+    };
+
+    /** Last frame → first. The zoom waits on this, so it gets its full run. */
     const sweepBackwards = () => {
       const d = s.duration;
-      if (!d) return handOverToScroll();
+      if (!d) return finishOpener();
       s.sweeping = true;
-      // Budget is whatever is LEFT of the opener's first beat, so however long
-      // hydration and metadata took, the sweep still lands on the zoom.
-      const budget = Math.max(MIN_SWEEP_MS, OPENER_SWEEP_MS - performance.now());
+      // A fixed duration, started when the video can actually seek — NOT what is
+      // left of a deadline. Measuring from page load meant hydration ate the
+      // sweep and the reverse playback was over before it was visible.
+      const budget = OPENER_SWEEP_MS;
       const from = performance.now();
       s.rendered = d;
       s.target = d;
@@ -136,7 +146,7 @@ export function HeroScrubVideo({
           s.raf = requestAnimationFrame(step);
           return;
         }
-        handOverToScroll();
+        finishOpener();
       };
       s.raf = requestAnimationFrame(step);
     };
@@ -146,8 +156,18 @@ export function HeroScrubVideo({
       s.started = true;
       s.duration = video.duration || 0;
       video.pause();
-      if (opener) sweepBackwards();
-      else handOverToScroll();
+      handOverToScroll();
+    };
+
+    // The sweep seeks hard and backwards, so it waits for decodable data rather
+    // than just metadata — starting on metadata alone meant seeking against a
+    // file the browser had barely begun fetching, and most frames never drew.
+    const startSweepWhenReady = () => {
+      if (s.started || s.openerDone) return;
+      s.started = true;
+      s.duration = video.duration || 0;
+      video.pause();
+      sweepBackwards();
     };
 
     const onScroll = () => {
@@ -156,18 +176,23 @@ export function HeroScrubVideo({
       runLoop();
     };
 
-    video.addEventListener("loadedmetadata", init);
+    const onReady = opener ? startSweepWhenReady : init;
+    // HAVE_FUTURE_DATA: enough buffered to decode around the playhead.
+    const readyEvent = opener ? "canplay" : "loadedmetadata";
+    const readyState = opener ? 3 : 1;
+
+    video.addEventListener(readyEvent, onReady);
     video.addEventListener("seeked", onSeeked);
     window.addEventListener("scroll", onScroll, { passive: true });
-    if (video.readyState >= 1) init();
+    if (video.readyState >= readyState) onReady();
 
     return () => {
       cancelAnimationFrame(s.raf);
-      video.removeEventListener("loadedmetadata", init);
+      video.removeEventListener(readyEvent, onReady);
       video.removeEventListener("seeked", onSeeked);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [opener]);
+  }, [opener, onOpenerDone]);
 
   return (
     <video
