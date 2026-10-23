@@ -102,31 +102,6 @@ html.lenis body {
 }
 
 /* ============================================================
-   HERO OPENER — the panel arrives small, then zooms open
-   ============================================================ */
-/* The small state is plain CSS so it is already painted from the server
-   markup — doing it in JS showed a full-size panel for one frame before
-   hydration shrank it.
-
-   The zoom is a transition, not a timed animation, because it must wait for
-   the video to finish running backwards. On a timer it fired while the sweep
-   was still starting, and the reverse playback was never actually seen.
-
-   Desktop only (smaller tiers have no video to sweep) and skipped outright
-   when the reader asked for less motion. */
-@media (min-width: 1024px) and (prefers-reduced-motion: no-preference) {
-  .hero-opener {
-    transform: scale(0.3);
-    will-change: transform;
-  }
-  .hero-opener[data-open="true"] {
-    transform: scale(1);
-    /* Longer and gentler than a UI easing: this is a camera moving toward
-       the reader, so it eases in as well as out. MUST match OPENER_ZOOM_MS. */
-    transition: transform 1600ms cubic-bezier(0.33, 0, 0.2, 1);
-  }
-}
-/* ============================================================
    HERO STILL — crop differs per tier
    ============================================================ */
 /* The phone frame is composed for a narrow panel, where a centred crop clips

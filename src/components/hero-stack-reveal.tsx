@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import {
   motion,
   useScroll,
@@ -12,8 +12,6 @@ import type { Dict } from "@/lib/dict";
 import { TechStack } from "@/components/tech-stack";
 import { useMediaQuery, LG } from "@/lib/use-media-query";
 import { pageMax } from "@/lib/layout";
-import { useLenis } from "lenis/react";
-import { OPENER_MAX_WAIT_MS, OPENER_ZOOM_MS } from "@/lib/hero-opener";
 
 /**
  * Hero → TechStack. Desktop gets a two-phase scroll sequence; phone and tablet
@@ -43,68 +41,6 @@ import { OPENER_MAX_WAIT_MS, OPENER_ZOOM_MS } from "@/lib/hero-opener";
  */
 export function HeroStackReveal({ dict }: { dict: Dict }) {
   const stackRef = useRef<HTMLDivElement>(null);
-  const openerRef = useRef<HTMLDivElement>(null);
-  const lenis = useLenis();
-
-  // Decided once, synchronously, from the same conditions the CSS uses — not
-  // from the media-query hook below, whose server snapshot would read "mobile"
-  // on the first client render and flip the opener off for a frame.
-  const [openerRuns] = useState(
-    () =>
-      typeof window !== "undefined" &&
-      window.matchMedia("(min-width: 1024px)").matches &&
-      window.matchMedia("(prefers-reduced-motion: no-preference)").matches &&
-      window.scrollY === 0,
-  );
-  const [opened, setOpened] = useState(false);
-  const contentReady = !openerRuns || opened;
-
-  // Cued by the video, not by a timer: the zoom has to wait for the sweep to
-  // reach frame 0, otherwise it fires while the reverse playback is still
-  // getting going and the playback is never seen.
-  const openPanel = useCallback(() => setOpened(true), []);
-
-  // How long the sweep says it will take, so neither the zoom nor the backstop
-  // below has to guess.
-  const [sweepMs, setSweepMs] = useState<number | null>(null);
-  const noteSweep = useCallback((ms: number) => setSweepMs(ms), []);
-
-  // Start the zoom BEFORE the sweep ends, so the panel is already drifting
-  // closer while the last of the gesture plays and the two land together.
-  useEffect(() => {
-    if (!openerRuns || sweepMs == null || opened) return;
-    const lead = setTimeout(openPanel, Math.max(0, sweepMs - OPENER_ZOOM_MS));
-    return () => clearTimeout(lead);
-  }, [openerRuns, sweepMs, opened, openPanel]);
-
-  useEffect(() => {
-    // Loads that get no opener (mobile, reduced motion, a restored scroll
-    // position) must not sit at the small state the server painted. Written
-    // straight to the DOM rather than through state, so the server and the
-    // first client render agree on "closed" and React has nothing to patch.
-    if (!openerRuns) {
-      openerRef.current?.setAttribute("data-open", "true");
-      return;
-    }
-    lenis?.stop();
-    return () => lenis?.start();
-  }, [openerRuns, lenis]);
-
-  // Backstop. Before the sweep reports in we are only waiting for it to
-  // start; once it has, we wait out its own length too. Either way the panel
-  // opens rather than stranding at 30% if the video never cues the zoom.
-  useEffect(() => {
-    if (!openerRuns || opened) return;
-    const t = setTimeout(openPanel, (sweepMs ?? 0) + OPENER_MAX_WAIT_MS);
-    return () => clearTimeout(t);
-  }, [openerRuns, opened, sweepMs, openPanel]);
-
-  // Let the page go once the zoom has finished.
-  useEffect(() => {
-    if (!opened || !openerRuns) return;
-    const release = setTimeout(() => lenis?.start(), OPENER_ZOOM_MS);
-    return () => clearTimeout(release);
-  }, [opened, openerRuns, lenis]);
   const reduce = useReducedMotion();
   const isDesktop = useMediaQuery(LG);
   const animate = isDesktop && !reduce;
@@ -142,24 +78,9 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
           {/* heroY recede lives INSIDE the sticky → 0 while pinned, recedes after */}
           <motion.div
             style={animate ? { y: heroY } : undefined}
-            className="origin-top will-change-transform lg:h-full"
+            className="origin-top will-change-transform lg:h-full lg:[&>section]:h-full"
           >
-            {/* The opener zoom lives on its own element so it cannot fight the
-                recede transform above it. Its animation is CSS (globals.css):
-                it has to be painted from the server markup, before hydration. */}
-            <div
-              ref={openerRef}
-              data-open={opened ? "true" : "false"}
-              className="hero-opener h-full lg:[&>section]:h-full"
-            >
-              <Hero
-                dict={dict}
-                opener={openerRuns}
-                contentReady={contentReady}
-                onOpenerStart={noteSweep}
-                onOpenerDone={openPanel}
-              />
-            </div>
+            <Hero dict={dict} />
           </motion.div>
         </div>
       </div>
