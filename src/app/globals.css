@@ -120,6 +120,39 @@ html.lenis body {
 }
 
 /* ============================================================
+   HERO INTRO ZOOM — the backdrop arrives from slightly too close
+   and settles at 100%
+   ============================================================ */
+
+/* Numbers lifted from the reference (nova-dental-dev.webflow.io), not guessed:
+   its `.hero__bg` runs scale 1.12 → 1 over 1.8s on GSAP's `power2.out`.
+   `power2` is GSAP's name for a CUBIC curve, and 1−(1−t)³ is exactly what
+   cubic-bezier(1/3, 1, 2/3, 1) describes — so this is the same motion, with no
+   GSAP and no JS. The long tail is the point: the earlier hand-rolled zoom read
+   as abrupt because it spent its travel in the first third of its run.
+
+   The start value is painted by the SERVER: a `from` keyframe with fill-mode
+   `both` is in force on the very first frame. Setting it from JS instead would
+   show the settled photo for a beat and then jump back out — the hydration
+   flash the <picture> swap above was written to remove from this panel.
+
+   No base transform, so reduced motion simply lands on the settled 100%. */
+@media (prefers-reduced-motion: no-preference) {
+  .hero-intro-zoom {
+    animation: hero-intro-zoom 1.8s cubic-bezier(0.333, 1, 0.667, 1) both;
+  }
+}
+
+@keyframes hero-intro-zoom {
+  from {
+    transform: scale(1.12);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
    PROGRESSIVE BLUR — content softens toward the bottom edge
    (layers stacked in the React component)
    ============================================================ */
