@@ -11,8 +11,14 @@ import type { Dict } from "@/lib/dict";
 const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
 const container: Variants = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+  // The group fades as a whole, not just its children: the third one carries a
+  // top border, and with only the children hidden that rule sat on screen as a
+  // bare line across the panel before anything else had arrived.
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.07, delayChildren: 0.05 },
+  },
 };
 const fadeUp: Variants = {
   hidden: { opacity: 0, y: 22 },
@@ -48,6 +54,7 @@ export function Hero({
   dict,
   opener = false,
   contentReady = true,
+  onOpenerStart,
   onOpenerDone,
 }: {
   dict: Dict;
@@ -55,6 +62,8 @@ export function Hero({
   opener?: boolean;
   /** Hold the copy back until the opener has zoomed the panel open. */
   contentReady?: boolean;
+  /** Fired with how long the sweep will take, once it begins. */
+  onOpenerStart?: (sweepMs: number) => void;
   /** Fired when the backwards sweep ends, so the panel can zoom. */
   onOpenerDone?: () => void;
 }) {
@@ -76,7 +85,11 @@ export function Hero({
       {/* background — scrubbed video on desktop, static photo + fade on
           phone/tablet. The cursor water-drops reveal is still kept in
           hero-reveal.tsx if we ever revert. */}
-      <HeroBackground opener={opener} onOpenerDone={onOpenerDone} />
+      <HeroBackground
+        opener={opener}
+        onOpenerStart={onOpenerStart}
+        onOpenerDone={onOpenerDone}
+      />
 
       {/* eyebrow — Geist Mono 10px (mobile) → 12px / 1.2px / uppercase / 90% */}
       <motion.div

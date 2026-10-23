@@ -64,6 +64,11 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
   // getting going and the playback is never seen.
   const openPanel = useCallback(() => setOpened(true), []);
 
+  // How long the sweep says it will take — the clip's own length, so the
+  // backstop below cannot fire in the middle of it.
+  const [sweepMs, setSweepMs] = useState<number | null>(null);
+  const noteSweep = useCallback((ms: number) => setSweepMs(ms), []);
+
   useEffect(() => {
     // Loads that get no opener (mobile, reduced motion, a restored scroll
     // position) must not sit at the small state the server painted. Written
@@ -74,14 +79,17 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
       return;
     }
     lenis?.stop();
-    // If the video never becomes seekable, open anyway rather than leaving
-    // the panel stranded at 30%.
-    const safety = setTimeout(openPanel, OPENER_MAX_WAIT_MS);
-    return () => {
-      clearTimeout(safety);
-      lenis?.start();
-    };
-  }, [openerRuns, lenis, openPanel]);
+    return () => lenis?.start();
+  }, [openerRuns, lenis]);
+
+  // Backstop. Before the sweep reports in we are only waiting for it to
+  // start; once it has, we wait out its own length too. Either way the panel
+  // opens rather than stranding at 30% if the video never cues the zoom.
+  useEffect(() => {
+    if (!openerRuns || opened) return;
+    const t = setTimeout(openPanel, (sweepMs ?? 0) + OPENER_MAX_WAIT_MS);
+    return () => clearTimeout(t);
+  }, [openerRuns, opened, sweepMs, openPanel]);
 
   // Let the page go once the zoom has finished.
   useEffect(() => {
@@ -140,6 +148,7 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
                 dict={dict}
                 opener={openerRuns}
                 contentReady={contentReady}
+                onOpenerStart={noteSweep}
                 onOpenerDone={openPanel}
               />
             </div>

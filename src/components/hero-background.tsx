@@ -24,9 +24,11 @@ const STILL_BOX = "absolute inset-x-0 top-0 h-[72%] lg:h-full";
 
 export function HeroBackground({
   opener = false,
+  onOpenerStart,
   onOpenerDone,
 }: {
   opener?: boolean;
+  onOpenerStart?: (sweepMs: number) => void;
   onOpenerDone?: () => void;
 }) {
   const isDesktop = useMediaQuery(LG);
@@ -59,6 +61,7 @@ export function HeroBackground({
         <HeroScrubVideo
           src="/hero.mp4"
           opener={opener}
+          onOpenerStart={onOpenerStart}
           onOpenerDone={onOpenerDone}
         />
       )}

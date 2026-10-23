@@ -2,21 +2,18 @@
  * Timings for the hero opener, shared by the CSS in globals.css and the JS that
  * sweeps the video backwards through it.
  *
- * The sweep owns the clock: the zoom waits for it to finish rather than running
- * on its own schedule. An earlier version gave the sweep whatever was LEFT of a
- * fixed deadline, so hydration and video loading ate it — on a real load it got
- * ~200ms, far too little for seeking to render more than a couple of frames,
- * and the reverse playback was never actually seen.
+ * The sweep runs for the video's OWN length, so the gesture plays at the speed
+ * it was shot at; the zoom then waits for it to finish. Earlier versions gave
+ * the sweep a fixed budget and it raced — the glasses going on were over before
+ * they could be read.
  */
-
-/** How long the video takes to run from its last frame back to its first. */
-export const OPENER_SWEEP_MS = 1200;
 
 /** Zoom to full size. MUST match the transition duration in globals.css. */
 export const OPENER_ZOOM_MS = 600;
 
 /**
- * If the video has not become seekable by now, open anyway. Without this a
- * failed or very slow video would leave the panel stuck at 30% forever.
+ * Slack for the safety net: how long to wait for the video to become seekable
+ * before opening regardless, and how much grace the sweep gets on top of its
+ * own length. Without it a failed video would strand the panel at 30%.
  */
 export const OPENER_MAX_WAIT_MS = 2500;

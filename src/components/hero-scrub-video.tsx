@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { OPENER_SWEEP_MS } from "@/lib/hero-opener";
+import { OPENER_MAX_WAIT_MS } from "@/lib/hero-opener";
 
 /**
  * Scroll-scrubbed background video for a PINNED hero (see HeroStackReveal).
@@ -26,10 +26,13 @@ const EASE = 0.1; // how fast `rendered` catches `target` per frame (lower = mor
 export function HeroScrubVideo({
   src,
   opener = false,
+  onOpenerStart,
   onOpenerDone,
 }: {
   src: string;
   opener?: boolean;
+  /** Fired with how long the sweep will take, once it actually begins. */
+  onOpenerStart?: (sweepMs: number) => void;
   /** Fired when the backwards sweep lands on frame 0, so the zoom can start. */
   onOpenerDone?: () => void;
 }) {
@@ -128,10 +131,11 @@ export function HeroScrubVideo({
       const d = s.duration;
       if (!d) return finishOpener();
       s.sweeping = true;
-      // A fixed duration, started when the video can actually seek — NOT what is
-      // left of a deadline. Measuring from page load meant hydration ate the
-      // sweep and the reverse playback was over before it was visible.
-      const budget = OPENER_SWEEP_MS;
+      // The clip's own length, so the gesture reads at the speed it was shot
+      // at. A fixed budget made it race: at a second or so the glasses were on
+      // before the eye caught the movement.
+      const budget = d * 1000;
+      onOpenerStart?.(budget);
       const from = performance.now();
       s.rendered = d;
       s.target = d;
@@ -164,6 +168,7 @@ export function HeroScrubVideo({
     // file the browser had barely begun fetching, and most frames never drew.
     const startSweepWhenReady = () => {
       if (s.started || s.openerDone) return;
+      clearTimeout(giveUp);
       s.started = true;
       s.duration = video.duration || 0;
       video.pause();
@@ -176,6 +181,12 @@ export function HeroScrubVideo({
       runLoop();
     };
 
+    // If the file never becomes seekable, give up waiting and let the panel
+    // open — handled here because this is the only place that knows.
+    const giveUp = opener
+      ? setTimeout(finishOpener, OPENER_MAX_WAIT_MS)
+      : undefined;
+
     const onReady = opener ? startSweepWhenReady : init;
     // HAVE_FUTURE_DATA: enough buffered to decode around the playhead.
     const readyEvent = opener ? "canplay" : "loadedmetadata";
@@ -187,12 +198,13 @@ export function HeroScrubVideo({
     if (video.readyState >= readyState) onReady();
 
     return () => {
+      clearTimeout(giveUp);
       cancelAnimationFrame(s.raf);
       video.removeEventListener(readyEvent, onReady);
       video.removeEventListener("seeked", onSeeked);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [opener, onOpenerDone]);
+  }, [opener, onOpenerDone, onOpenerStart]);
 
   return (
     <video
