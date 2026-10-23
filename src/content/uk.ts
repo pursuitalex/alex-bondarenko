@@ -334,5 +334,7 @@ export const uk = {
     { name: "VirtualEmployer", year: "2024", type: "Business" },
     { name: "MedEcho", year: "2023", type: "E-commerce" },
     { name: "UkrainianHelicopters", year: "2022", type: "Landing" },
+    { name: "Lucky Energy", year: "2026", type: "E-commerce" },
+    { name: "BitHide", year: "2026", type: "Technology" },
   ],
 };
