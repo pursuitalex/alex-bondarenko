@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { OPENER_MAX_WAIT_MS } from "@/lib/hero-opener";
+import { OPENER_MAX_WAIT_MS, OPENER_SPEED } from "@/lib/hero-opener";
 
 /**
  * Scroll-scrubbed background video for a PINNED hero (see HeroStackReveal).
@@ -69,6 +69,10 @@ export function HeroScrubVideo({
     // One seek finished — chain to wherever `rendered` is now.
     const onSeeked = () => {
       s.isSeeking = false;
+      // During the sweep the rAF loop alone decides the next frame. Chaining
+      // here as well meant two drivers racing, and a seek could land out of
+      // order — seen as a single blink partway through the opener.
+      if (s.sweeping) return;
       if (Math.abs(s.rendered - video.currentTime) > 0.01) {
         s.isSeeking = true;
         video.currentTime = s.rendered;
@@ -131,18 +135,20 @@ export function HeroScrubVideo({
       const d = s.duration;
       if (!d) return finishOpener();
       s.sweeping = true;
-      // The clip's own length, so the gesture reads at the speed it was shot
-      // at. A fixed budget made it race: at a second or so the glasses were on
-      // before the eye caught the movement.
-      const budget = d * 1000;
+      // The clip's own length, taken faster: slow enough to read the gesture,
+      // quick enough not to hold the reader. A fixed budget made it race.
+      const budget = (d * 1000) / OPENER_SPEED;
       onOpenerStart?.(budget);
       const from = performance.now();
-      s.rendered = d;
-      s.target = d;
-      seek(d);
+      // A hair short of the end: seeking exactly to duration lands past the
+      // last frame in some browsers and paints nothing.
+      const last = Math.max(0, d - 0.04);
+      s.rendered = last;
+      s.target = last;
+      seek(last);
       const step = () => {
         const p = Math.min(1, (performance.now() - from) / budget);
-        const t = d * (1 - p);
+        const t = last * (1 - p);
         s.rendered = t;
         s.target = t;
         seek(t);

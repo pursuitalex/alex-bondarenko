@@ -64,10 +64,18 @@ export function HeroStackReveal({ dict }: { dict: Dict }) {
   // getting going and the playback is never seen.
   const openPanel = useCallback(() => setOpened(true), []);
 
-  // How long the sweep says it will take — the clip's own length, so the
-  // backstop below cannot fire in the middle of it.
+  // How long the sweep says it will take, so neither the zoom nor the backstop
+  // below has to guess.
   const [sweepMs, setSweepMs] = useState<number | null>(null);
   const noteSweep = useCallback((ms: number) => setSweepMs(ms), []);
+
+  // Start the zoom BEFORE the sweep ends, so the panel is already drifting
+  // closer while the last of the gesture plays and the two land together.
+  useEffect(() => {
+    if (!openerRuns || sweepMs == null || opened) return;
+    const lead = setTimeout(openPanel, Math.max(0, sweepMs - OPENER_ZOOM_MS));
+    return () => clearTimeout(lead);
+  }, [openerRuns, sweepMs, opened, openPanel]);
 
   useEffect(() => {
     // Loads that get no opener (mobile, reduced motion, a restored scroll
